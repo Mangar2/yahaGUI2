@@ -1,4 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+    box-sizing: border-box;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+app-header,
+app-nav,
+app-footer {
+    padding: 20px;
+    margin: 5px;
+}
+
+app-header {
+    order: 1;
+    height: 100px;
+    flex: 100%;
+    background: #f1b5b5;
+}
+
+app-nav {
+    order: 4;
+    flex: 0 1 200px;
+    background: rgb(176, 165, 199);
+}
+
+app-overview-screen {
+    display: flex;
+    justify-content: flex-start;
+    order: 3;
+    flex: 1;
+    min-height: 500px;
+    margin: 5px;
+    background: rgb(211, 216, 215);
+}
+
+app-footer {
+    order: 5;
+    height: 100px;
+    flex: 0 1 100%;
+    background: rgb(119, 120, 121);
+}

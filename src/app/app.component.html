@@ -1,15 +1,8 @@
 
-<style>
-  :host {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 14px;
-    color: #333;
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+<div class="container">
+  <app-header></app-header>
+  <app-nav></app-nav>
+  <router-outlet></router-outlet>
 
-</style>
-
-<app-toolbar></app-toolbar>
-<router-outlet></router-outlet>
+  <app-footer></app-footer>
+</div>

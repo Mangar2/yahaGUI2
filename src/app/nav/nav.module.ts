@@ -1,21 +1,33 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ToolbarComponent } from './toolbar/toolbar.component';
+
+import {MatListModule} from '@angular/material/list'; 
+
+
 import { SidenavComponent } from './sidenav/sidenav.component';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
+import { NavComponent } from './nav/nav.component';
 
 
 
 @NgModule({
   declarations: [
-    ToolbarComponent,
-    SidenavComponent
+    SidenavComponent,
+    HeaderComponent,
+    FooterComponent,
+    NavComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    MatListModule
+    
   ],
   exports: [
-    ToolbarComponent,
-    SidenavComponent
+    SidenavComponent,
+    HeaderComponent,
+    FooterComponent,
+    NavComponent
   ]
 })
 export class NavModule { }
