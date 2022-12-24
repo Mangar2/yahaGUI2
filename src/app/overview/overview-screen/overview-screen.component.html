@@ -1,5 +1,5 @@
 
-<app-sidenav [navItems]="navItems"></app-sidenav>
+<app-sidenav [navItems]="navItems" (navItemEvent)="selectItem($event)"></app-sidenav>
 <main>
   <p>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit.

@@ -1,5 +1,10 @@
 <aside>
     <mat-nav-list>
-        <a mat-list-item *ngFor="let navItem of navItems" class="nav-button">{{navItem}}</a>
+        <mat-list-item *ngFor="let navItem of navItems" class="nav-button" 
+            [class.nav-button-active]="isActive(navItem)"
+            [class.nav-button-normal]="!isActive(navItem)"
+            (click)="onClick(navItem)">
+            <span [class.nav-button-text-normal]="!isActive(navItem)" [class.nav-button-text-active]="isActive(navItem)">{{navItem}}</span>
+        </mat-list-item>
     </mat-nav-list>
 </aside>

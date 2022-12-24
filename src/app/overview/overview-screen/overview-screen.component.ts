@@ -12,21 +12,28 @@ export class OverviewScreenComponent {
   title = 'yahaGUI2';
 
   curNode: IStorageNode | null = null;
-  topic = '';
-  curChunk = '';
-  navItems = ['<', 'first', 'second']
+  topicChunks: string[] = [];
+  navItems: string[] = []
 
   constructor(
     private messagesService: MessagesService,
     private messagesTree: MessageTreeService) {
   }
 
+
   ngOnInit() {
+    this.requestMessages();
+  }
+
+  /**
+   * Subscribes to the api to get message data
+   */
+  private requestMessages(): void {
     this.messagesService.getMessages('', [], false, false, 7).subscribe(data => {
       if (data.body && data.body.payload) {
         const topicList: ITopicList = data.body.payload;
         this.messagesTree.replaceManyNodes(topicList);
-        this.setNavItems(this.topic);
+        this.setNavItems(this.topicChunks);
       }
     })
   }
@@ -35,14 +42,15 @@ export class OverviewScreenComponent {
    * Sets the nav items to the selections of the current menu position
    * @param topic topic string of the current menu position
    */
-  setNavItems(topic: string) {
-    this.curNode = this.messagesTree.getNodeByTopic(topic);
+  private setNavItems(topicChunks: string[]) {
+    this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
     if (this.curNode) {
+      const curChunk = this.topicChunks.at(-1)
       const childs = this.curNode.childs;
       const navItems = [];
-      if (this.curChunk !== '') {
+      if (curChunk) {
         navItems.push('<');
-        navItems.push(this.curChunk)
+        navItems.push(curChunk)
       } else {
         navItems.push('favorites')
       }
@@ -51,5 +59,19 @@ export class OverviewScreenComponent {
       }
       this.navItems = navItems;
     }
+  }
+
+  /**
+   * Selects a new item
+   * @param topicChunk chunk of the topic that is selected
+   */
+  public selectItem(topicChunk: string) {
+    const curChunk = this.topicChunks.at(-1);
+    if (topicChunk === '<') {
+      this.topicChunks.pop();
+    } else if (topicChunk !== curChunk && topicChunk !== 'favorites') {
+      this.topicChunks.push(topicChunk);
+    }
+    this.setNavItems(this.topicChunks);
   }
 }
