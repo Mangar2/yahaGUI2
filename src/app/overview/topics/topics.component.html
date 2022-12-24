@@ -1,1 +1,7 @@
-<p>topics works!</p>
+<div class="card-box">
+    <button *ngFor="let message of messages" (click)="onSwitch(message.topic)">
+        <span class="card-topic">{{getName(message.topic)}}</span>
+        <span class="card-value">{{message.value}}</span>
+    </button>
+</div>
+

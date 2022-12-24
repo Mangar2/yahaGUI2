@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MessagesService } from 'src/app/api/messages.service';
+import { IMessages } from 'src/app/data/message';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { ITopicList } from 'src/app/data/topic_data';
 
@@ -14,6 +15,7 @@ export class OverviewScreenComponent {
   curNode: IStorageNode | null = null;
   topicChunks: string[] = [];
   navItems: string[] = []
+  topics: IMessages = [];
 
   constructor(
     private messagesService: MessagesService,
@@ -33,32 +35,60 @@ export class OverviewScreenComponent {
       if (data.body && data.body.payload) {
         const topicList: ITopicList = data.body.payload;
         this.messagesTree.replaceManyNodes(topicList);
-        this.setNavItems(this.topicChunks);
+        this.updateView(this.topicChunks);
       }
     })
+  }
+
+  /**
+   * Uddate the view, when the topic changed
+   * @param topicChunks elements of the current topic
+   */
+  private updateView(topicChunks: string[]) {
+    this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
+    if (this.curNode) {
+      this.setNavItems(this.curNode);
+      this.setTopics(this.curNode);
+    }
   }
 
   /**
    * Sets the nav items to the selections of the current menu position
    * @param topic topic string of the current menu position
    */
-  private setNavItems(topicChunks: string[]) {
-    this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
-    if (this.curNode) {
-      const curChunk = this.topicChunks.at(-1)
-      const childs = this.curNode.childs;
-      const navItems = [];
-      if (curChunk) {
-        navItems.push('<');
-        navItems.push(curChunk)
-      } else {
-        navItems.push('favorites')
-      }
-      for (const topicChunk in childs) {
-        navItems.push(topicChunk);
-      }
-      this.navItems = navItems;
+  private setNavItems(curNode: IStorageNode) {
+    const curChunk = this.topicChunks.at(-1)
+    const childs = curNode.childs;
+    const navItems = [];
+    if (curChunk) {
+      navItems.push('<');
+      navItems.push(curChunk)
+    } else {
+      navItems.push('favorites')
     }
+    for (const topicChunk in childs) {
+      navItems.push(topicChunk);
+    }
+    this.navItems = navItems;
+  }
+
+  /**
+   * Sets the topics of the current node. Topics are child elements having a topic and a value
+   * @param curNode current node in the message tree
+   */
+  private setTopics(curNode: IStorageNode) {
+    const childs = curNode.childs;
+    const topics: IMessages = [];
+    for (const topicChunk in childs) {
+      const child = childs[topicChunk];
+      if (child.value && child.topic) {
+        topics.push ({
+          value: child.value,
+          topic: child.topic
+        })
+      }
+    }
+    this.topics = topics;
   }
 
   /**
@@ -67,11 +97,16 @@ export class OverviewScreenComponent {
    */
   public selectItem(topicChunk: string) {
     const curChunk = this.topicChunks.at(-1);
+    let changed = false;
     if (topicChunk === '<') {
       this.topicChunks.pop();
+      changed = true;
     } else if (topicChunk !== curChunk && topicChunk !== 'favorites') {
       this.topicChunks.push(topicChunk);
+      changed = true;
     }
-    this.setNavItems(this.topicChunks);
+    if (changed) {
+      this.updateView(this.topicChunks);
+    }
   }
 }
