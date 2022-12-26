@@ -1,10 +1,23 @@
 <aside>
-    <mat-nav-list>
-        <mat-list-item *ngFor="let navItem of navItems" class="nav-button" 
+    <mat-nav-list *ngIf="!enableConfiguration">
+        <mat-list-item *ngFor="let navItem of enabledNavItems" class="nav-button" 
             [class.nav-button-active]="isActive(navItem)"
             [class.nav-button-normal]="!isActive(navItem)"
             (click)="onClick(navItem)">
             <span [class.nav-button-text-normal]="!isActive(navItem)" [class.nav-button-text-active]="isActive(navItem)">{{navItem}}</span>
         </mat-list-item>
+        <mat-list-item  class="configuration-button" (click)="setConfigurationMode(true)">
+            {{getConfiguationString()}}
+        </mat-list-item>
     </mat-nav-list>
+    <mat-selection-list *ngIf="enableConfiguration" (selectionChange)="onSelectionChange($event)">
+        <mat-list-option *ngFor="let navItem of navItems" class="nav-button" [value]="navItem" [selected]="isSelected(navItem)"
+            [disabled] = "isActive(navItem)"
+            >
+            <span [class.nav-button-text-normal]="!isActive(navItem)" [class.nav-button-text-active]="isActive(navItem)">{{navItem}}</span>
+        </mat-list-option>
+        <mat-list-item class="configuration-button" (click)="setConfigurationMode(false)">
+            Done
+        </mat-list-item>
+    </mat-selection-list>
 </aside>

@@ -61,8 +61,8 @@ export class OverviewScreenComponent {
     const childs = curNode.childs;
     const navItems = [];
     if (curChunk) {
+      navItems.push(curChunk);
       navItems.push('<');
-      navItems.push(curChunk)
     } else {
       navItems.push('favorites')
     }

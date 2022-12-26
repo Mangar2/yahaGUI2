@@ -1,7 +1,6 @@
+<app-sidenav [navItems]="navItems" [topicChunks]="topicChunks" (navItemEvent)="selectItem($event)">
+</app-sidenav>
 
-<app-sidenav [navItems]="navItems" (navItemEvent)="selectItem($event)"></app-sidenav>
 <main>
-<app-topics [messages]="topics"></app-topics>
+    <app-topics [messages]="topics"></app-topics>
 </main>
-
-  
