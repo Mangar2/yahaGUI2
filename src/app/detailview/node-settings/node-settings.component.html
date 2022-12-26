@@ -1,0 +1,8 @@
+<div class="settings-box">
+    <mat-form-field appearance="fill">
+        <mat-label>Select topic type</mat-label>
+        <mat-select [(value)]="type">
+            <mat-option *ngFor="let type of types" value="{{type}}">{{type}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

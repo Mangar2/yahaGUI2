@@ -11,7 +11,6 @@ import { ITopicList } from 'src/app/data/topic_data';
   styleUrls: ['./overview-screen.component.less']
 })
 export class OverviewScreenComponent {
-  title = 'yahaGUI2';
 
   curNode: IStorageNode | null = null;
   topicChunks: string[] = [];
@@ -29,6 +28,13 @@ export class OverviewScreenComponent {
    */
   ngOnInit() {
     this.requestMessages();
+    this.subscribeToQueryParameter();
+  }
+
+  /**
+   * Subscribes to the "topic" query parameters and updates the view on change
+   */
+  private subscribeToQueryParameter() {
     const topic = this.route.queryParamMap.subscribe(params => {
       const topic = params.get('topic');
       if (topic) {
