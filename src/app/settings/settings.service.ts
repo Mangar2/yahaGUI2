@@ -10,6 +10,42 @@ export interface INavSettings {
   isEnabled(name: string): boolean;
   allEnabled(): boolean;
   countDisabled(): number;
+
+  setTopicType(type: string): void;
+  getTopicType(): string;
+
+  setValueType(type: string): void;
+  getValueType(): string;
+
+  setTopicRank(type: string): void;
+  getTopicRank(): string;
+
+  setIconName(type: string, iconName: string): void;
+  getIconName(type: string): string;
+
+  setHistoryType(type: string): void;
+  getHistoryType(): string;
+
+  setChartType(type: string): void;
+  getChartType(): string;
+
+}
+
+type parameter_t = { [index: string]: string}
+type nodeConfig_t = { disabled?: string[], parameter?: parameter_t }
+
+/**
+ * Checks, if an object is empty
+ * @param obj object to check
+ * @returns true, if the object has no own properties
+ */
+function isEmpty(obj: any): boolean {
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -17,9 +53,11 @@ export interface INavSettings {
  */
 class NavSettings implements INavSettings {
   disabled: string[];
+  parameter: parameter_t;
 
-  constructor(disabled: string[] = []) {
+  constructor(disabled: string[] = [], parameter: parameter_t = {}) {
     this.disabled = disabled;
+    this.parameter = parameter;
   }
 
   /**
@@ -76,6 +114,85 @@ class NavSettings implements INavSettings {
     return this.disabled.length;
   }
 
+  /**
+   * Sets a parameter
+   * @param name name of the parameter
+   * @param value value of the parameter
+   */
+  private setParameter(name:string, value:string | null): void {
+    if (name) {
+      if (value) {
+        this.parameter[name] = value;
+      } else {
+        delete this.parameter[name];
+      }
+    }
+  }
+
+  /**
+   * Gets the value of a parameter
+   * @param name name of the parameter
+   * @returns value of the parameter or null, if it does not exist
+   */
+  private getParameter(name: string): string | null {
+    let result = null;
+    if (name) {
+      result = this.parameter[name];
+      if (result === undefined) {
+        result = null;
+      }
+    }
+    return result;    
+  }
+  
+  setTopicType(type: string): void {
+    this.setParameter("topicType", type === 'Undefined' ? null : type);
+  };
+  getTopicType(): string {
+    const result = this.getParameter("topicType");
+    return result? result : 'Undefined';
+  }
+
+  setValueType(type: string): void {
+    this.setParameter("valueType", type === 'Undefined' ? null : type);
+  };
+  getValueType(): string {
+    const result = this.getParameter("valueType");
+    return result? result : 'Undefined';
+  }
+
+  setTopicRank(rank: string): void {
+    this.setParameter("topicRank", rank === 'None' ? null : rank);
+  };
+  getTopicRank(): string {
+    const result = this.getParameter("topicRank");
+    return result? result : 'None';
+  }
+
+  setIconName(type: string, iconName: string): void {
+    this.setParameter("icon_" + type, type === 'None' ? null : type);
+  };
+  getIconName(type: string): string {
+    const result = this.getParameter("icon_" + type);
+    return result? result : 'None';
+  }
+
+  setHistoryType(rank: string): void {
+    this.setParameter("history", rank === 'None' ? null : rank);
+  };
+  getHistoryType(): string {
+    const result = this.getParameter("history");
+    return result? result : 'None';
+  }
+
+  setChartType(rank: string): void {
+    this.setParameter("chart", rank === 'None' ? null : rank);
+  };
+  getChartType(): string {
+    const result = this.getParameter("chart");
+    return result? result : 'None';
+  }
+
 }
 
 @Injectable({
@@ -123,14 +240,6 @@ export class SettingsService {
   }
 
   /**
-   * Saves the nav settings to local store
-   */
-  public saveToLocalStore() {
-    const data = JSON.stringify(this.navSettingsStore);
-    localStorage.setItem(this.storeName, data);
-  }
-
-  /**
    * Gets the navigation settings from the local store
    */
   private getFromLocalStore() {
@@ -140,7 +249,7 @@ export class SettingsService {
         const dataObj = JSON.parse(storedData);
         for (const key in dataObj) {
           const value = dataObj[key];
-          const navSettings = new NavSettings(value.disabled);
+          const navSettings = new NavSettings(value.disabled, value.parameter);
           this.setNavSettings(key, navSettings);
         }
       }
@@ -150,17 +259,25 @@ export class SettingsService {
     }
   }
 
+  
+
   /**
    * Writes navigation settings to the local store
    */
   public writeToLocalStore() {
     if (this.navSettingsStore) {
-      const dataToStore: { [index:string]: { disabled: string[] }} = {}
+      const dataToStore: { [index:string]: nodeConfig_t} = {}
       for (const topic in this.navSettingsStore) {
-        console.log(topic);
         const value: NavSettings = this.navSettingsStore[topic];
+        const nodeConfig: nodeConfig_t = {}
         if (!value.allEnabled()) {
-          dataToStore[topic] = { disabled: value.disabled }
+          nodeConfig.disabled = value.disabled;
+        }
+        if (!isEmpty(value.parameter)) {
+          nodeConfig.parameter = value.parameter;
+        }
+        if (!isEmpty(nodeConfig)) {
+          dataToStore[topic] = nodeConfig;
         }
       }
       localStorage.setItem(this.storeName, JSON.stringify(dataToStore));

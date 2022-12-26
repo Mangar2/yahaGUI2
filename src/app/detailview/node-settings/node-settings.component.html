@@ -1,8 +1,20 @@
 <div class="settings-box">
     <mat-form-field appearance="fill">
         <mat-label>Select topic type</mat-label>
-        <mat-select [(value)]="type">
-            <mat-option *ngFor="let type of types" value="{{type}}">{{type}}</mat-option>
+        <mat-select [(value)]="topicType" (selectionChange)="onSelectTopic()">
+            <mat-option *ngFor="let type of topicTypes" value="{{type}}">{{type}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field *ngIf="topicType === 'Parameter'" topic appearance="fill">
+        <mat-label>Select value type</mat-label>
+        <mat-select [(value)]="valueType">
+            <mat-option *ngFor="let type of valueTypes" value="{{type}}">{{type}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Select topic rank</mat-label>
+        <mat-select [(value)]="topicRank">
+            <mat-option *ngFor="let rank of topicRanks" value="{{rank}}">{{rank}}</mat-option>
         </mat-select>
     </mat-form-field>
 </div>

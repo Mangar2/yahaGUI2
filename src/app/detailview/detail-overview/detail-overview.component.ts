@@ -13,7 +13,7 @@ import { ITopicList } from 'src/app/data/topic_data';
 export class DetailOverviewComponent {
 
   curNode: IStorageNode | null = null;
-  topicChunks: string[] = [];
+  topicChunks: string[] | null = null;
   nodeName: string = "";
   nodeValue: string = "";
 
@@ -51,9 +51,7 @@ export class DetailOverviewComponent {
    * @param topicChunks elements of the current topic
    */
     private updateView(topicChunks: string[]) {
-      console.log(this.messagesTree);
       this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
-      console.log(this.curNode);
       const nodeName = topicChunks.at(-1);
       this.nodeName = nodeName ? nodeName : 'Unknown, an error occured';
       if (this.curNode && this.curNode.value) {
