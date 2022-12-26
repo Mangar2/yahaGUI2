@@ -163,8 +163,6 @@ export class SettingsService {
           dataToStore[topic] = { disabled: value.disabled }
         }
       }
-      console.log(this.navSettingsStore);
-      console.log(dataToStore);
       localStorage.setItem(this.storeName, JSON.stringify(dataToStore));
     }
   }

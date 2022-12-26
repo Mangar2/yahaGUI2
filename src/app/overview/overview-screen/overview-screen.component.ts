@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { MessagesService } from 'src/app/api/messages.service';
 import { IMessages } from 'src/app/data/message';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
@@ -19,12 +20,24 @@ export class OverviewScreenComponent {
 
   constructor(
     private messagesService: MessagesService,
-    private messagesTree: MessageTreeService) {
+    private messagesTree: MessageTreeService,
+    private router: Router,
+    private route: ActivatedRoute) {
   }
 
-
+  /**
+   */
   ngOnInit() {
     this.requestMessages();
+    const topic = this.route.queryParamMap.subscribe(params => {
+      const topic = params.get('topic');
+      if (topic) {
+        this.topicChunks = topic.split('/');
+      } else {
+        this.topicChunks = []
+      }
+      this.updateView(this.topicChunks);
+    })
   }
 
   /**
@@ -107,6 +120,11 @@ export class OverviewScreenComponent {
     }
     if (changed) {
       this.updateView(this.topicChunks);
+      const topic = this.topicChunks.join('/');
+      const navigationExtras: NavigationExtras = {
+        queryParams: { topic }
+      };
+      this.router.navigate([], navigationExtras);
     }
   }
 }

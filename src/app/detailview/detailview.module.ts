@@ -1,10 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DetailOverviewComponent } from './detail-overview/detail-overview.component';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    DetailOverviewComponent
+  ],
   imports: [
     CommonModule
   ]

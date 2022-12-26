@@ -155,8 +155,6 @@ export class MessageTreeService {
    */
   public getNodeByTopicChunks(topicChunks: string[]): IStorageNode | null {
     let node: StorageNode | null = this.tree
-    console.log(node);
-    console.log(topicChunks);
     for (const topicChunk of topicChunks) {
       if (!node) {
         break
