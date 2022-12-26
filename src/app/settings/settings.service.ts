@@ -146,51 +146,51 @@ class NavSettings implements INavSettings {
   }
   
   setTopicType(type: string): void {
-    this.setParameter("topicType", type === 'Undefined' ? null : type);
+    this.setParameter("topicType", type === 'Automatic' ? null : type);
   };
   getTopicType(): string {
     const result = this.getParameter("topicType");
-    return result? result : 'Undefined';
+    return result? result : 'Automatic';
   }
 
   setValueType(type: string): void {
-    this.setParameter("valueType", type === 'Undefined' ? null : type);
+    this.setParameter("valueType", type === 'Automatic' ? null : type);
   };
   getValueType(): string {
     const result = this.getParameter("valueType");
-    return result? result : 'Undefined';
+    return result? result : 'Automatic';
   }
 
   setTopicRank(rank: string): void {
-    this.setParameter("topicRank", rank === 'None' ? null : rank);
+    this.setParameter("topicRank", rank === 'Automatic' ? null : rank);
   };
   getTopicRank(): string {
     const result = this.getParameter("topicRank");
-    return result? result : 'None';
+    return result? result : 'Automatic';
   }
 
   setIconName(type: string, iconName: string): void {
-    this.setParameter("icon_" + type, type === 'None' ? null : type);
+    this.setParameter("icon_" + type, type === 'Automatic' ? null : type);
   };
   getIconName(type: string): string {
     const result = this.getParameter("icon_" + type);
-    return result? result : 'None';
+    return result? result : 'Automatic';
   }
 
-  setHistoryType(rank: string): void {
-    this.setParameter("history", rank === 'None' ? null : rank);
+  setHistoryType(history: string): void {
+    this.setParameter("history", history === 'Automatic' ? null : history);
   };
   getHistoryType(): string {
     const result = this.getParameter("history");
-    return result? result : 'None';
+    return result? result : 'Automatic';
   }
 
-  setChartType(rank: string): void {
-    this.setParameter("chart", rank === 'None' ? null : rank);
+  setChartType(chartType: string): void {
+    this.setParameter("chart", chartType === 'Automatic' ? null : chartType);
   };
   getChartType(): string {
     const result = this.getParameter("chart");
-    return result? result : 'None';
+    return result? result : 'Automatic';
   }
 
 }

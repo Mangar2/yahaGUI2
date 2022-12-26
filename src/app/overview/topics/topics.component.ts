@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { IMessages } from 'src/app/data/message';
+import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
   selector: 'app-topics',
@@ -9,7 +10,9 @@ import { IMessages } from 'src/app/data/message';
 })
 export class TopicsComponent {
 
-  constructor(private router:Router) {
+  constructor(
+    private settingsService: SettingsService,
+    private router:Router) {
   }
 
   @Input() messages: IMessages | null = null;
@@ -20,6 +23,13 @@ export class TopicsComponent {
    */
   onSwitch(topic: string): void {
     console.log(topic);
+  }
+
+  /**
+   * Opens a detail view for a topic
+   * @param topic topic for detail-view
+   */
+  viewDetails(topic:string): void {
     this.openDetailView(topic);
   }
 
@@ -43,6 +53,25 @@ export class TopicsComponent {
     const chunks = topic.split('/');
     const last = chunks ? chunks.pop(): '';
     return last ? last: '';
+  }
+
+  /**
+   * Checks, if a topic is a switch
+   * @param topic topic to check
+   * @returns true, if the topic is a swith
+   */
+  isSwitch(topic: string): boolean {
+    const settings = this.settingsService.getNavSettings(topic.split('/'));
+    const topicType = settings.getTopicType();
+    return topicType === 'Switch';
+  }
+
+  /**
+   * Stops propagation of a click event
+   * @param event click event
+   */
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
   }
 
 }

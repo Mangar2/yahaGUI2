@@ -1,7 +1,10 @@
 <div class="card-box">
-    <button *ngFor="let message of messages" (click)="onSwitch(message.topic)">
+    <button *ngFor="let message of messages" (click)="viewDetails(message.topic)">
         <span class="card-topic">{{getName(message.topic)}}</span>
-        <span class="card-value">{{message.value}}</span>
+        <span class="card-value"  *ngIf="!isSwitch(message.topic)">{{message.value}}</span>
+        <div *ngIf="isSwitch(message.topic)">
+            <mat-slide-toggle (click)="stopPropagation($event)"></mat-slide-toggle>
+        </div>
     </button>
 </div>
 

@@ -12,16 +12,16 @@ export class NodeSettingsComponent {
 
   settings: INavSettings | null = null;
 
-  topicTypes = ['Undefined', 'Information', 'Switch', 'Parameter'];
-  topicType = 'Undefined';
+  topicTypes = ['Automatic', 'Information', 'Switch', 'Parameter'];
+  topicType = 'Automatic';
   
-  valueTypes = ['Undefined', 'Integer', 'Number', 'Enumeration', 'String'];
-  valueType = 'Undefined';
+  valueTypes = ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'];
+  valueType = 'Automatic';
 
-  topicRanks = ['None', 1, 2, 3, 4, 5]
-  topicRank = 'None';
+  topicRanks = ['Automatic', 1, 2, 3, 4, 5]
+  topicRank = 'Automatic';
 
-  topicPicture = 'None';
+  topicPicture = 'Automatic';
 
   constructor(private settingService: SettingsService) {
   }

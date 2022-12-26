@@ -4,6 +4,7 @@ import { MessagesService } from 'src/app/api/messages.service';
 import { IMessages } from 'src/app/data/message';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { ITopicList } from 'src/app/data/topic_data';
+import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
   selector: 'app-overview-screen',
@@ -16,10 +17,12 @@ export class OverviewScreenComponent {
   topicChunks: string[] = [];
   navItems: string[] = []
   topics: IMessages = [];
+  settings: INavSettings | null = null;
 
   constructor(
     private messagesService: MessagesService,
     private messagesTree: MessageTreeService,
+    private settingsService: SettingsService,
     private router: Router,
     private route: ActivatedRoute) {
   }
@@ -68,6 +71,7 @@ export class OverviewScreenComponent {
     if (this.curNode) {
       this.setNavItems(this.curNode);
       this.setTopics(this.curNode);
+      this.settings = this.settingsService.getNavSettings(topicChunks);
     }
   }
 
