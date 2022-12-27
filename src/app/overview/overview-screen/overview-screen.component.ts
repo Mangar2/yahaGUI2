@@ -70,7 +70,7 @@ export class OverviewScreenComponent {
     this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
     if (this.curNode) {
       this.setNavItems(this.curNode);
-      this.setTopics(this.curNode);
+      this.setTopics(this.curNode, topicChunks);
       this.settings = this.settingsService.getNavSettings(topicChunks);
     }
   }
@@ -96,15 +96,37 @@ export class OverviewScreenComponent {
   }
 
   /**
+   * Gets the configured additional messages to show for the node
+   * @param topicChunks current tree position
+   * @returns list of additional messages to show in the current node 
+   */
+  private getConfiguredMessages(topicChunks: string[]): IMessages {
+    const result: IMessages = [];
+    const topic: string = topicChunks.join('/');
+    const additionalTopics = this.settingsService.getAdditionalTopics(topic, topicChunks.length + 1);
+    for (const additionalTopic of additionalTopics) {
+      const node = this.messagesTree.getNodeByTopic(additionalTopic);
+      if (node && node.value && node.topic) {
+        result.push({
+          value: node.value,
+          topic: node.topic
+        })
+      }
+    }
+    return result;
+  }
+
+  /**
    * Sets the topics of the current node. Topics are child elements having a topic and a value
    * @param curNode current node in the message tree
    */
-  private setTopics(curNode: IStorageNode) {
+  private setTopics(curNode: IStorageNode, topicChunks: string[]) {
     const childs = curNode.childs;
-    const topics: IMessages = [];
+    const settings = this.settingsService.getNavSettings(topicChunks);
+    const topics: IMessages = this.getConfiguredMessages(topicChunks);
     for (const topicChunk in childs) {
       const child = childs[topicChunk];
-      if (child.value && child.topic) {
+      if (child.value && child.topic && settings.isEnabled(topicChunk)) {
         topics.push ({
           value: child.value,
           topic: child.topic
@@ -136,5 +158,12 @@ export class OverviewScreenComponent {
       };
       this.router.navigate([], navigationExtras);
     }
+  }
+
+  /**
+   * Updates the view after a configuration change
+   */
+  public onConfigChange() {
+    this.updateView(this.topicChunks);
   }
 }
