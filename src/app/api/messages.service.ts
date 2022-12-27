@@ -19,14 +19,19 @@ interface IResponseBody {
     payload: ITopicList | null;
 }
 
+/**
+ * Result structure of a publish command
+ */
+type PublishResult = string;
+
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class MessagesService {
 
-  host = 'http://192.168.0.4/angular/'
+    host = 'http://192.168.0.4/angular/'
 
-  constructor(private httpClient: HttpClient) { }
+    constructor(private httpClient: HttpClient) { }
 
     /**
      * Gets device infos from the server
@@ -36,9 +41,8 @@ export class MessagesService {
      * @param reason true, if reason information will be added
      * @param levelAmount amount of data level to retrieve
      */
-    getMessages(topic: string, nodes: IMessages, history: boolean, 
-        reason: boolean = true, levelAmount: number = 1) :  Observable<HttpResponse<IResponseBody>>  
-    {
+    getMessages(topic: string, nodes: IMessages, history: boolean,
+        reason: boolean = true, levelAmount: number = 1): Observable<HttpResponse<IResponseBody>> {
         // The app uses '|' instead of '/' to get around angular routing, the interface needs '/'
         topic = topic.split('|').join('/')
         const data = {
@@ -48,9 +52,23 @@ export class MessagesService {
             nodes,
             levelAmount
         }
-        const observable  = 
+        const observable =
             this.httpClient.post<IResponseBody>(this.host + "angular/api/sensor.php", data, { observe: 'response' });
         return observable
+    }
+
+    /**
+     * publish data to the sensor interface
+     * @param topic topic to look for
+     * @param value value to set
+     */
+    publish(topic: string, value: string): Observable<HttpResponse<PublishResult>> {
+        const data = {
+            topic: topic + '/set',
+            value: value,
+            timestamp: (new Date()).toISOString()
+        }
+        return this.httpClient.post<PublishResult>(this.host + "angular/api/publish.php", data, { observe: 'response' });
     }
 
 }
