@@ -1,11 +1,17 @@
 <div class="card-box">
     <button *ngFor="let message of messages" (click)="viewDetails(message.topic)">
-        <span class="card-topic">{{getName(message.topic)}}</span>
-        <span class="card-value" *ngIf="!isSwitch(message.topic)">{{message.value}}</span>
-        <div *ngIf="isSwitch(message.topic)">
-            <mat-slide-toggle (click)="stopPropagation($event)" (change)="onChange(message.topic, $event)"
-                [checked]="isSwitchOn(message.topic)">
-            </mat-slide-toggle>
+        <div class="text-info-box">
+            <span class="card-topic">{{getName(message.topic)}}</span>
+            <span class="card-value" *ngIf="!isSwitch(message.topic)">{{message.value}}</span>
+            <div *ngIf="isSwitch(message.topic)">
+                <mat-slide-toggle (click)="stopPropagation($event)" (change)="onChange(message.topic, $event)"
+                    [checked]="isSwitchOn(message.topic)">
+                </mat-slide-toggle>
+            </div>
         </div>
+        <div class="spinner-box" *ngIf="updatingTopics[message.topic] === true">
+            <mat-spinner diameter="40" strokeWidth="10"></mat-spinner>
+        </div>
+
     </button>
 </div>

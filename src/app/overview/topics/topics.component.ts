@@ -1,10 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Directive, ViewChildren, QueryList } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { MessagesService } from 'src/app/api/messages.service';
-import { IMessages } from 'src/app/data/message';
+import { IMessage, IMessages } from 'src/app/data/message';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
-import { MessageTreeService } from 'src/app/data/message-tree.service';
-import { SubscribeService } from 'src/app/api/subscribe.service';
+import { ChangeService } from 'src/app/api/change.service';
+import { Subscription } from 'rxjs'
+
 
 @Component({
   selector: 'app-topics',
@@ -13,15 +13,20 @@ import { SubscribeService } from 'src/app/api/subscribe.service';
 })
 export class TopicsComponent {
 
+  subscription: Subscription | null = null;
+  updatingTopics: { [index:string]: boolean } = {};
+
   constructor(
     private settingsService: SettingsService,
-    private messageAPI: MessagesService,
-    private messageTree: MessageTreeService,
+    private changeService: ChangeService,
     private router: Router) {
   }
 
   @Input() messages: IMessages | null = null;
-  subscribeService = new SubscribeService(this.messageAPI, this.messageTree);
+
+  ngOnChanges() {
+  }
+
 
   /**
    * Switches the value of a topic by sending a switch command
@@ -50,7 +55,6 @@ export class TopicsComponent {
     this.router.navigate(['yahagui', 'detailview'], navigationExtras);
   }
 
-
   /**
    * Gets the name (the last element of a topic)
    * @param topic topic to get the name 
@@ -63,21 +67,41 @@ export class TopicsComponent {
   }
 
   /**
+   * Returns a message by its topic
+   * @param topic of the message
+   * @returns message 
+   */
+  private getMessageByTopic(topic: string): IMessage | null {
+    if (this.messages !== null) {
+      for (const message of this.messages) {
+        if (message.topic === topic) {
+          return message;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Gets a value of a topic
    * @param topic topic to get the value
    * @returns value of the topic
    */
   getValue(topic: string): string | number {
-    let result: string | number = "";
-    if (this.messages !== null) {
-      for (const message of this.messages) {
-        if (message.topic === topic) {
-          result = message.value;
-          break;
-        }
-      }
+    const message = this.getMessageByTopic(topic);
+    return message ? message.value : "";
+  }
+
+  /**
+   * Sets the value of a message identified by its topic
+   * @param topic topic of the message
+   * @param value new value of the message
+   */
+  setValue(topic: string, value: string) {
+    const message = this.getMessageByTopic(topic);
+    if (message) {
+      message.value = value;
     }
-    return result;
   }
 
   /**
@@ -117,36 +141,34 @@ export class TopicsComponent {
   }
 
   /**
-   * Publishes a new value for a topic
-   * @param topic topic to publish
-   * @param value value to publish
-   */
-  publishChange(topic: string, value: string): void {
-    this.messageAPI.publish(topic, value).subscribe(resp => {
-      if (resp.status !== 200 || resp.body !== "puback") {
-        console.log("Error while publishing a change: ");
-        console.log(resp);
-      } else {
-        this.subscribeService.poll(topic, value);
-      }
-    });
-  }
-
-  /**
    * Handles a switch change
    * @param topic of the element
    * @param event change event
    */
   onChange(topic: string, event: any): void {
     const newValue = event.checked ? 'on' : 'off';
-    this.publishChange(topic, newValue);
+    event.source.checked = !event.checked;
+    if (this.updatingTopics[topic] === true) {
+      return;
+    }
+    this.updatingTopics[topic] = true;
+    this.subscription = this.changeService.publishChange(topic, newValue, 10, () => { 
+      const curValue = this.changeService.getValueFromTopic(topic);
+      if (curValue) {
+        event.source.checked = curValue === 'on';
+        this.setValue(topic, curValue);
+        this.updatingTopics[topic] = false;
+      }
+    });
   }
 
   /**
    * We need to unsubscribe to everything before leaving this view
    */
   ngOnDestroy() {
-    this.subscribeService.unsubscribe();
+    if (this.subscription !== null) {
+      this.subscription.unsubscribe();
+    }
   }
 
 

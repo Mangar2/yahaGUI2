@@ -10,12 +10,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, lastValueFrom } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { ITopicList } from 'src/app/data/topic_data';
 import { IMessages } from 'src/app/data/message';
 
-interface IResponseBody {
+export interface IResponseBody {
     payload: ITopicList | null;
 }
 

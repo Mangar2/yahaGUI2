@@ -10,79 +10,110 @@
  * @Brief Subscription manager service
  */
 
+import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subscription, take, timer } from "rxjs";
 import { MessageTreeService } from "../data/message-tree.service";
-import { MessagesService } from "./messages.service";
+import { IResponseBody, MessagesService } from "./messages.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChangeService {
 
-    subscription: Subscription;
-    hasPendingRequest = false;
+  hasPendingRequest = false;
 
-    constructor(private messageService: MessagesService,
-        private messageTree: MessageTreeService) {
-        this.subscription = new Subscription();
-    }
+  constructor(private messageService: MessagesService,
+    private messageTree: MessageTreeService) {
+  }
 
-    /**
-     * Sets, if there is already a pending request
-     * @param state pending request state
-     */
-    setPendingRequest(state: boolean) {
-        this.hasPendingRequest = state;
-    }
+  /**
+   * Sets, if there is already a pending request
+   * @param state pending request state
+   */
+  setPendingRequest(state: boolean) {
+    this.hasPendingRequest = state;
+  }
 
-    /**
-     * Polls a subscription multiple times
-     * @param topic topic to poll
-     * @param expectedValue value to poll for
-     * @param count Amount of polls
-     * @param initialDelayInMs delay before the first poll
-     * @param delayInMs delay between polls
-     */
-    poll(topic: string, expectedValue: string, count: number = 5, initialDelayInMs: number = 500, delayInMs: number = 500) {
-        const pollForUpdate = timer(initialDelayInMs, delayInMs).pipe(take(count))
-        this.subscription.add(pollForUpdate.subscribe(() => {
-            if (!this.hasPendingRequest) {
-                this.subscription.add(this.readUpdates(topic, expectedValue, false, false))
-            }
+  /**
+   * Publishes a new value for a topic
+   * @param topic topic to publish
+   * @param value value to publish
+   */
+  publishChange(topic: string, value: string, pollCount = 5, callback: Function): Subscription {
+    const subscription = new Subscription();
+    const messageObservable = this.messageService.getMessages(topic, [], false, false, 0)
+    const pollForUpdate = timer(500, 500).pipe(take(pollCount))
+
+    subscription.add(this.messageService.publish(topic, value).subscribe(resp => {
+      if (resp.status !== 200 || resp.body !== "puback") {
+        console.log("Error while publishing a change: ");
+        console.log(resp);
+      } else {
+        subscription.add(pollForUpdate.subscribe({
+          next: () => {
+            subscription.add(messageObservable.subscribe(resp => {
+              const validated = this.setAndCheckResult(resp, topic, value);
+              if (validated) {
+                subscription.unsubscribe();
+                callback();
+              }
+            }))
+          },
+          error: () => { callback(); },
+          complete: () => { callback(); }
         }))
-    }
+      }
+    }));
+    return subscription;
+  }
 
-    /**
-     * Read data from the server based on a topic
-     * @param deviceTopic topic to fetch data for
-     * @param requestHistory true, to add the history
-     * @param requestReason true, if reason information will be added
-     */
-    readUpdates(topic: string, expectedValue: string, requestHistory: boolean, requestReason: boolean): Subscription {
-        const messageObservable = this.messageService.getMessages(topic, [], requestHistory, requestReason, 1)
-
-        return messageObservable.subscribe(resp => {
-            console.log(resp);
-            if (resp.status !== 200 || !resp.body || !resp.body.payload) {
-                console.log("Error while polling for updates: ");
-                console.log(resp);
-                return;
-            }
-            const payload = resp.body.payload;
-            this.messageTree.replaceManyNodes(payload);
-            const newMessage = this.messageTree.getNodeByTopic(topic);
-            if (newMessage && newMessage.topic === topic && newMessage.value === expectedValue) {
-                console.log("got expected value");
-            }
-        })
+  /**
+   * Gets a value from a topic
+   * @param topic topic to get value from
+   */
+  public getValueFromTopic(topic: string): string | null {
+    const newMessage = this.messageTree.getNodeByTopic(topic);
+    let result: string | null = null;
+    if (newMessage && newMessage.value && newMessage.topic === topic) {
+      result = String(newMessage.value);
     }
+    return result;
+  }
 
-    /**
-     * Cancels all tasks from observables held by this subscription
-     */
-    unsubscribe() {
-        this.subscription.unsubscribe();
+  /**
+   * Sets a result of a getmessage call and checks the result agains an expected value
+   * @param resp the getmessage call result
+   * @param topic the relevant topic
+   * @param expectedValue the expected value of the topic
+   * @returns true, if the result shows that the topic now has the expected value
+   */
+  private setAndCheckResult(resp: HttpResponse<IResponseBody>, topic: string, expectedValue: string): boolean {
+    if (resp.status !== 200 || !resp.body || !resp.body.payload) {
+      console.log("Error while polling for updates: ");
+      console.log(resp);
+      return false;
     }
+    const payload = resp.body.payload;
+    this.messageTree.replaceManyNodes(payload);
+    const value = this.getValueFromTopic(topic);
+    const result = value !== null && value === expectedValue;
+    return result;
+  }
+
+  /**
+   * Publishes a new value for a topic
+   * @param topic topic to publish
+   * @param value value to publish
+   */
+  async asyncPublishChange(topic: string, value: string, pollCount = 5) {
+    return await this.messageService.publish(topic, value);
+  }
+
+  /**
+   * Cancels all tasks from observables held by this subscription
+   */
+  unsubscribe() {
+  }
 
 }
