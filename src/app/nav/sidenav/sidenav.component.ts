@@ -13,6 +13,7 @@ export class SidenavComponent {
   @Input() topicChunks: string[] | null = null;
   @Input() enableConfiguration: boolean = false;
   @Output() navItemEvent = new EventEmitter<string>();
+  @Output() configChangeEvent = new EventEmitter();
 
   settings: INavSettings | null = null;
   enabledNavItems: string[] = [];
@@ -96,6 +97,7 @@ export class SidenavComponent {
     if (mode === false) {
       this.updateEnabledNavItems();
       this.settingService.writeToLocalStore();
+      this.configChangeEvent.emit();
     }
   }
 

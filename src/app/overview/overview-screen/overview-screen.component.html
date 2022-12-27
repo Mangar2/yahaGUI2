@@ -1,6 +1,7 @@
-<app-sidenav [navItems]="navItems" [topicChunks]="topicChunks" (navItemEvent)="selectItem($event)">
+<app-sidenav [navItems]="navItems" [topicChunks]="topicChunks" (navItemEvent)="selectItem($event)"
+    (configChangeEvent)="onConfigChange()">
 </app-sidenav>
 
 <main>
-    <app-topics [messages]="topics" ></app-topics>
+    <app-topics [messages]="topics"></app-topics>
 </main>

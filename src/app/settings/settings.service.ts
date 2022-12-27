@@ -18,7 +18,7 @@ export interface INavSettings {
   getValueType(): string;
 
   setTopicRank(type: string): void;
-  getTopicRank(): string;
+  getTopicRank(): number;
 
   setIconName(type: string, iconName: string): void;
   getIconName(type: string): string;
@@ -95,7 +95,8 @@ class NavSettings implements INavSettings {
    * @returns true, if the item is enabled
    */
   isEnabled(name: string): boolean {
-    return !this.disabled.includes(name);
+    // Disable all topics ending with "set" as they are set requests and not status information
+    return !this.disabled.includes(name) && name !== 'set';
   }
 
   /**
@@ -164,9 +165,10 @@ class NavSettings implements INavSettings {
   setTopicRank(rank: string): void {
     this.setParameter("topicRank", rank === 'Automatic' ? null : rank);
   };
-  getTopicRank(): string {
-    const result = this.getParameter("topicRank");
-    return result? result : 'Automatic';
+  getTopicRank(): number {
+    const curValue: string | number | null = this.getParameter("topicRank");
+    const result: number = (curValue === null || curValue === 'Automatic') ? 6 : Number(curValue);
+    return result;
   }
 
   setIconName(type: string, iconName: string): void {
@@ -282,6 +284,40 @@ export class SettingsService {
       }
       localStorage.setItem(this.storeName, JSON.stringify(dataToStore));
     }
+  }
+
+  /**
+   * Checks, if a topic is a descendant, but not a direct descendant (child).
+   * Childs are already show, thus they will be scipped in the additional topics list.
+   * @param topic topic to check
+   * @param descendantTopic descendant topic to check
+   * @returns true, if descendantTopic is a descendant of topic, but not a direct descendant
+   */
+  private isDescendantButNotChild(topic: string, descendantTopic: string): boolean {
+    let result = descendantTopic.startsWith(topic);
+    if (result) {
+      const topicLen = topic === '' ? 0 : topic.split('/').length
+      const isChild = topicLen + 1 == descendantTopic.split('/').length;
+      result = result && !isChild;
+    }
+    return result;
+  }
+
+  /**
+   * Gets the additional topics to show in a level
+   * @param topic current topic
+   * @param level current level
+   * @returns array of topics to show
+   */
+  public getAdditionalTopics(topic: string, level: number): string[] {
+    const result: string[] = [];
+    for (const curTopic in this.navSettingsStore) {
+      const navSetting: INavSettings = this.navSettingsStore[curTopic];
+      if (this.isDescendantButNotChild(topic, curTopic) && navSetting.getTopicRank() <= level) {
+        result.push(curTopic);
+      }
+    }
+    return result;
   }
 
 }

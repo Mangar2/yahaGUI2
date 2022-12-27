@@ -41,7 +41,7 @@ export class NodeSettingsComponent {
   update(settings: INavSettings) {
     this.topicType = settings.getTopicType();
     this.valueType = settings.getValueType();
-    this.topicRank = settings.getTopicRank();
+    this.topicRank = String(settings.getTopicRank());
   }
 
   /**
@@ -49,6 +49,14 @@ export class NodeSettingsComponent {
    */
   onSelectTopic() {
     this.settings?.setTopicType(this.topicType);
+    this.settingService.writeToLocalStore();
+  }
+
+  /**
+   * Sets the rank to the setting store
+   */
+  onSelectRank() {
+    this.settings?.setTopicRank(this.topicRank);
     this.settingService.writeToLocalStore();
   }
 

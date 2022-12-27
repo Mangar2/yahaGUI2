@@ -13,7 +13,7 @@
     </mat-form-field>
     <mat-form-field appearance="fill">
         <mat-label>Select topic rank</mat-label>
-        <mat-select [(value)]="topicRank">
+        <mat-select [(value)]="topicRank" (selectionChange)="onSelectRank()">
             <mat-option *ngFor="let rank of topicRanks" value="{{rank}}">{{rank}}</mat-option>
         </mat-select>
     </mat-form-field>
