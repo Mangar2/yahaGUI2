@@ -1,6 +1,4 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { ChangeService } from 'src/app/api/change.service';
 import { IStorageNode } from 'src/app/data/message-tree.service';
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
 import { INavSettings } from 'src/app/settings/settings.service';
@@ -22,7 +20,7 @@ export class StatusComponent {
   _navSettings: INavSettings | null = null;
   _topicNode: IStorageNode | null = null;
 
-  constructor(private changeService: ChangeService) {
+  constructor() {
     this.topicType = SettingDecisions.decideType("", "");
     this.valueType = SettingDecisions.decideValueType("", "");
   }
@@ -58,11 +56,7 @@ export class StatusComponent {
   @Input()
   set navSettings(navSettings: INavSettings | null) {
     this._navSettings = navSettings;
-    if (this.navSettings !== null) {
-      this.topicType = SettingDecisions.decideType(this.navSettings.getTopicType(), this.topicValue);
-      this.valueType = SettingDecisions.decideValueType(this.navSettings.getValueType(), this.topicValue);
 
-    }
   }
 
   get topicNode(): IStorageNode | null {
@@ -72,20 +66,19 @@ export class StatusComponent {
   @Input() 
   set topicNode(topicNode: IStorageNode | null) {
     this._topicNode = topicNode;
-    if (this.topicNode && this.topicNode.topic) {
+
+  }
+
+  ngOnChanges() {
+    if (this.navSettings && this.topicNode && this.topicNode.topic && this.topicNode.value) {
       const topicChunks = this.topicNode.topic.split('/');
       const nodeName = topicChunks.at(-1);
       this.topicName = nodeName ? nodeName : 'Unknown, an error occured';
       this.topicName = this.capitalizeFirstLetter(this.topicName);
-      if (this.topicNode.value) {
-        this.topicValue = this.topicNode.value.toString();
-      }
-    }
-  }
-
-  ngOnChanges() {
-    if (this.navSettings && this.topicNode) {
-      if (this.navSettings.getTopicType() === 'Automatic' && this.isUpdatable(this.topicNode)) {
+      this.topicValue = this.topicNode.value.toString();
+      this.topicType = SettingDecisions.decideType(this.navSettings.getTopicType(), this.topicValue);
+      this.valueType = SettingDecisions.decideValueType(this.navSettings.getValueType(), this.topicValue);
+      if (this.navSettings.getTopicType() === 'Automatic' && this.topicType === 'Information' && this.isUpdatable(this.topicNode)) {
         this.topicType = 'Parameter';
       }
     }
@@ -98,8 +91,11 @@ export class StatusComponent {
   /**
    * Handles the change of a topic value
    */
-  onTopicValueChange(): void {
-
+  onTopicValueChange(newValue: string): void {
+    if (this.isUpdatingTopic) {
+      return;
+    }
+    this.valueChangeEvent.emit(newValue);
   }
 
   /**
