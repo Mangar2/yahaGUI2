@@ -1,3 +1,11 @@
-<header>
-    <h2>Das ist noch nicht bearbeitet</h2>
+<header class="nav-box">
+    <button (click)="onClick(0)">
+        <mat-icon class="font-style" aria-hidden="false" aria-label="Home" fontIcon="home"></mat-icon>
+    </button>
+    <div *ngFor="let chunk of topicChunks; let i = index ">
+        <span>></span>
+        <button (click)="onClick(i + 1)">
+            {{chunk}}
+        </button>
+    </div>
 </header>
