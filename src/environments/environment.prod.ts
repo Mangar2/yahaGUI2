@@ -1,3 +1,3 @@
 export const environment = {
-    apiHost: ''
+    apiHost: 'http://192.168.0.4/angular/'
 }

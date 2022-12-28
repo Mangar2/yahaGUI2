@@ -91,13 +91,11 @@ export class DetailOverviewComponent {
     if (!this.topicChunks) {
       return;
     }
-    console.log(newValue)
     const topic = this.topicChunks.join('/');
     this.isUpdatingTopic = true;
     this.subscription = this.changeService.publishChange(topic, newValue, 10, () => {
       this.topicNode = this.messagesTree.getNodeByTopic(topic);
       if (this.topicNode && this.topicNode.value) {
-        // event.source.checked = curValue === 'on';
         this.isUpdatingTopic = false;
       }
     });

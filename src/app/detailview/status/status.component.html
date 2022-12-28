@@ -1,15 +1,20 @@
 <div class="status-box">
     <span class="status-headline">{{topicName}}</span>
     <span class="status-value" *ngIf="topicType === 'Information'">{{topicValue}}</span>
-    <mat-form-field *ngIf="topicType === 'Parameter'">
-        <mat-label>Value</mat-label>
-        <input matInput value="{{topicValue}}">
-    </mat-form-field>
-    <button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange()">Update
-    </button>
+    <div class="status-box" *ngIf="topicType === 'Parameter'">
+        <mat-form-field>
+            <mat-label>Value</mat-label>
+            <input matInput #topicValueInput value="{{topicValue}}">
+        </mat-form-field>
+
+        <button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange(topicValueInput.value)">Update
+        </button>
+    </div>
     <div *ngIf="topicType === 'Switch'">
-        <mat-slide-toggle (change)="onChange($event)"
-            [checked]="isSwitchOn()">
+        <mat-slide-toggle (change)="onChange($event)" [checked]="isSwitchOn()">
         </mat-slide-toggle>
+    </div>
+    <div class="spinner-box" *ngIf="isUpdatingTopic">
+        <mat-spinner diameter="40" strokeWidth="10"></mat-spinner>
     </div>
 </div>
