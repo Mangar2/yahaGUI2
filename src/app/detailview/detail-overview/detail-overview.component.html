@@ -1,4 +1,7 @@
 <main class="main-box">
-    <app-node-settings [topicChunks]="topicChunks"></app-node-settings>
-    <app-status [nodeName]="nodeName" [nodeValue]="nodeValue"></app-status>
+    <app-node-settings [topicChunks]="topicChunks" (settingChangeEvent)="onSettingChange()">
+    </app-node-settings>
+    <app-status [topicNode]="topicNode" [navSettings]="navSettings" [isUpdatingTopic]="isUpdatingTopic"
+        (valueChangeEvent)="onValueChange($event)">
+    </app-status>
 </main>

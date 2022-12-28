@@ -14,6 +14,7 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { ITopicList } from 'src/app/data/topic_data';
 import { IMessages } from 'src/app/data/message';
+import { environment } from 'src/environments/environment';
 
 export interface IResponseBody {
     payload: ITopicList | null;
@@ -29,7 +30,7 @@ type PublishResult = string;
 })
 export class MessagesService {
 
-    host = 'http://192.168.0.4/angular/'
+    host = environment.apiHost;
 
     constructor(private httpClient: HttpClient) { }
 

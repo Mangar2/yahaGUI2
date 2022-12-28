@@ -7,7 +7,7 @@
     </mat-form-field>
     <mat-form-field *ngIf="topicType === 'Parameter'" topic appearance="fill">
         <mat-label>Select value type</mat-label>
-        <mat-select [(value)]="valueType">
+        <mat-select [(value)]="valueType" (selectionChange)="onSelectValueType()">
             <mat-option *ngFor="let type of valueTypes" value="{{type}}">{{type}}</mat-option>
         </mat-select>
     </mat-form-field>

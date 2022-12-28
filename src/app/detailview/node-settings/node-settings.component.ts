@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
@@ -9,6 +9,7 @@ import { INavSettings, SettingsService } from 'src/app/settings/settings.service
 export class NodeSettingsComponent {
 
   @Input() topicChunks: string[] | null = null;
+  @Output() settingChangeEvent = new EventEmitter();
 
   settings: INavSettings | null = null;
 
@@ -50,7 +51,17 @@ export class NodeSettingsComponent {
   onSelectTopic() {
     this.settings?.setTopicType(this.topicType);
     this.settingService.writeToLocalStore();
+    this.settingChangeEvent.emit();
   }
+
+  /**
+   * Sets the type of the current value
+   */
+    onSelectValueType() {
+      this.settings?.setValueType(this.valueType);
+      this.settingService.writeToLocalStore();
+      this.settingChangeEvent.emit();
+    }
 
   /**
    * Sets the rank to the setting store
@@ -58,6 +69,7 @@ export class NodeSettingsComponent {
   onSelectRank() {
     this.settings?.setTopicRank(this.topicRank);
     this.settingService.writeToLocalStore();
+    this.settingChangeEvent.emit();
   }
 
 }

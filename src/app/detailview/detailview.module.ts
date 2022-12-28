@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input'; 
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { DetailOverviewComponent } from './detail-overview/detail-overview.component';
 import { StatusComponent } from './status/status.component';
@@ -17,7 +19,9 @@ import { NodeSettingsComponent } from './node-settings/node-settings.component';
   ],
   imports: [
     CommonModule,
-    MatSelectModule
+    MatSelectModule,
+    MatInputModule,
+    MatSlideToggleModule
   ]
 })
 export class DetailviewModule { }

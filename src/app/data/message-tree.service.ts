@@ -9,7 +9,9 @@
  * @Brief Class holding a tree of messages. The tree is organized according to the message topics.
  */
 
+import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { IResponseBody } from '../api/messages.service';
 import { IHistoryList, IReasons } from './message';
 import { ITopicData, ITopicList } from './topic_data';
 
@@ -213,6 +215,21 @@ export class MessageTreeService {
       for (let message of payload) {
         this.replaceSingleNode(message);
       }
+    }
+  }
+
+  /**
+   * Sets a result of a getmessage call and checks the result agains an expected value
+   * @param resp the getmessage call result
+   * @returns true, if the result shows that the topic now has the expected value
+   */
+  public setHttpResult(resp: HttpResponse<IResponseBody>): void {
+    if (resp.status !== 200 || !resp.body || !resp.body.payload) {
+      console.error("Error while calling http interface");
+      console.error(resp);
+    } else {
+      const payload = resp.body.payload;
+      this.replaceManyNodes(payload);
     }
   }
 }

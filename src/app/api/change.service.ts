@@ -89,31 +89,10 @@ export class ChangeService {
    * @returns true, if the result shows that the topic now has the expected value
    */
   private setAndCheckResult(resp: HttpResponse<IResponseBody>, topic: string, expectedValue: string): boolean {
-    if (resp.status !== 200 || !resp.body || !resp.body.payload) {
-      console.log("Error while polling for updates: ");
-      console.log(resp);
-      return false;
-    }
-    const payload = resp.body.payload;
-    this.messageTree.replaceManyNodes(payload);
+    this.messageTree.setHttpResult(resp);
     const value = this.getValueFromTopic(topic);
     const result = value !== null && value === expectedValue;
     return result;
-  }
-
-  /**
-   * Publishes a new value for a topic
-   * @param topic topic to publish
-   * @param value value to publish
-   */
-  async asyncPublishChange(topic: string, value: string, pollCount = 5) {
-    return await this.messageService.publish(topic, value);
-  }
-
-  /**
-   * Cancels all tasks from observables held by this subscription
-   */
-  unsubscribe() {
   }
 
 }

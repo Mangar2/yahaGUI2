@@ -1,2 +1,15 @@
-<h1>{{nodeName}}</h1>
-{{nodeValue}}
+<div class="status-box">
+    <span class="status-headline">{{topicName}}</span>
+    <span class="status-value" *ngIf="topicType === 'Information'">{{topicValue}}</span>
+    <mat-form-field *ngIf="topicType === 'Parameter'">
+        <mat-label>Value</mat-label>
+        <input matInput value="{{topicValue}}">
+    </mat-form-field>
+    <button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange()">Update
+    </button>
+    <div *ngIf="topicType === 'Switch'">
+        <mat-slide-toggle (change)="onChange($event)"
+            [checked]="isSwitchOn()">
+        </mat-slide-toggle>
+    </div>
+</div>

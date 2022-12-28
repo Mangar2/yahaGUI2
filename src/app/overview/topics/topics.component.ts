@@ -4,6 +4,7 @@ import { IMessage, IMessages } from 'src/app/data/message';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 import { ChangeService } from 'src/app/api/change.service';
 import { Subscription } from 'rxjs'
+import { SettingDecisions } from 'src/app/settings/setting-decisions';
 
 
 @Component({
@@ -112,14 +113,7 @@ export class TopicsComponent {
   isSwitch(topic: string): boolean {
     const settings = this.settingsService.getNavSettings(topic.split('/'));
     const topicType = settings.getTopicType();
-    let result = false;
-    if (topicType === 'Switch') {
-      result = true;
-    } else if (topicType === 'Automatic') {
-      const value = String(this.getValue(topic)).toLowerCase();
-      result = value === 'on' || value === 'off';
-    }
-    return result;
+    return SettingDecisions.isSwitch(topicType, this.getValue(topic));
   }
 
   /**
@@ -128,8 +122,7 @@ export class TopicsComponent {
    * @returns true, if the switch is on
    */
   isSwitchOn(topic: string): boolean {
-    const value = String(this.getValue(topic)).toLowerCase();
-    return value === 'on' || value === '1' || value === 'true';
+    return SettingDecisions.isSwitchOn(this.getValue(topic))
   }
 
   /**

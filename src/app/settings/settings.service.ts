@@ -29,6 +29,8 @@ export interface INavSettings {
   setChartType(type: string): void;
   getChartType(): string;
 
+  copy(): INavSettings;
+
 }
 
 type parameter_t = { [index: string]: string}
@@ -193,6 +195,10 @@ class NavSettings implements INavSettings {
   getChartType(): string {
     const result = this.getParameter("chart");
     return result? result : 'Automatic';
+  }
+  
+  copy(): INavSettings {
+    return new NavSettings(this.disabled, this.parameter);
   }
 
 }
