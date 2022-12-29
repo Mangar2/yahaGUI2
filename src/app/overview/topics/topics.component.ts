@@ -1,10 +1,11 @@
 import { Component, Input, Directive, ViewChildren, QueryList } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { IMessage, IMessages } from 'src/app/data/message';
-import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
+import { SettingsService } from 'src/app/settings/settings.service';
 import { ChangeService } from 'src/app/api/change.service';
 import { Subscription } from 'rxjs'
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
+import { DisplaynameService } from 'src/app/settings/displayname.service';
 
 
 @Component({
@@ -20,21 +21,13 @@ export class TopicsComponent {
   constructor(
     private settingsService: SettingsService,
     private changeService: ChangeService,
+    private displaynameService: DisplaynameService,
     private router: Router) {
   }
 
   @Input() messages: IMessages | null = null;
 
   ngOnChanges() {
-  }
-
-
-  /**
-   * Switches the value of a topic by sending a switch command
-   * @param topic Switches the value of a topic (between on and off)
-   */
-  onSwitch(topic: string): void {
-    console.log(topic);
   }
 
   /**
@@ -62,9 +55,7 @@ export class TopicsComponent {
    * @returns name of the topic
    */
   getName(topic: string): string {
-    const chunks = topic.split('/');
-    const last = chunks ? chunks.pop() : '';
-    return last ? last : '';
+    return this.displaynameService.deriveDisplayName(topic.split('/'));
   }
 
   /**

@@ -76,6 +76,7 @@ type IStorageNodes = IStorageNode[]
 export class MessageTreeService {
 
   tree: StorageNode = new StorageNode;
+  wordCount: { [index:string]: number} = {}
 
   constructor() { }
 
@@ -177,6 +178,31 @@ export class MessageTreeService {
   }
 
   /**
+   * Adds a topic Chunk to a word count statistic
+   * @param topicChunk current topic chunk
+   */
+  private addToWordCount(topicChunk: string) {
+    if (this.wordCount[topicChunk] === undefined) {
+      this.wordCount[topicChunk] = 1;
+    } else {
+      this.wordCount[topicChunk]++;
+    }
+  }
+
+  /**
+   * Returns the number of occurences of a word in the topic tree
+   * @param topicChunk word to look for
+   * @returns number of occurences of this word in the topic tree
+   */
+  public getWordCount(topicChunk: string): number {
+    if (this.wordCount[topicChunk] === undefined) {
+      return 0;
+    }  else {
+      return this.wordCount[topicChunk];
+    }
+  }
+
+  /**
    * Adds a node to the tree, if it does not exists
    * @param topic topic of the node
    */
@@ -189,6 +215,7 @@ export class MessageTreeService {
       }
       if (!node.childs[topicChunk]) {
         node.childs[topicChunk] = new StorageNode();
+        this.addToWordCount(topicChunk);
       }
       node = node.childs[topicChunk]
     }

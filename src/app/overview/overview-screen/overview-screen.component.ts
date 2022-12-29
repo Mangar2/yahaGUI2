@@ -16,7 +16,7 @@ export class OverviewScreenComponent {
   curNode: IStorageNode | null = null;
   topicChunks: string[] = [];
   navItems: string[] = []
-  topics: IMessages = [];
+  messages: IMessages = [];
   settings: INavSettings | null = null;
 
   constructor(
@@ -70,7 +70,7 @@ export class OverviewScreenComponent {
     this.curNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
     if (this.curNode) {
       this.setNavItems(this.curNode);
-      this.setTopics(this.curNode, topicChunks);
+      this.setMessages(this.curNode, topicChunks);
       this.settings = this.settingsService.getNavSettings(topicChunks);
     }
   }
@@ -117,23 +117,23 @@ export class OverviewScreenComponent {
   }
 
   /**
-   * Sets the topics of the current node. Topics are child elements having a topic and a value
+   * Sets the messages of the current node. Messages are child elements having a topic and a value
    * @param curNode current node in the message tree
    */
-  private setTopics(curNode: IStorageNode, topicChunks: string[]) {
+  private setMessages(curNode: IStorageNode, topicChunks: string[]) {
     const childs = curNode.childs;
     const settings = this.settingsService.getNavSettings(topicChunks);
     const topics: IMessages = this.getConfiguredMessages(topicChunks);
     for (const topicChunk in childs) {
       const child = childs[topicChunk];
-      if (child.value && child.topic && settings.isEnabled(topicChunk)) {
+      if (child.value !== undefined && child.topic && settings.isEnabled(topicChunk)) {
         topics.push ({
           value: child.value,
           topic: child.topic
         })
       }
     }
-    this.topics = topics;
+    this.messages = topics;
   }
 
   /**

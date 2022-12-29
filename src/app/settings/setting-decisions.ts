@@ -1,3 +1,14 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Brief Service deciding about types and status of a topic and its value
+ */
+
 export class SettingDecisions {
 
   /**
@@ -59,6 +70,7 @@ export class SettingDecisions {
       return false;
     }
     const lowercaseValue = String(value).toLowerCase();
-    return lowercaseValue === 'on' || lowercaseValue === '1' || lowercaseValue === 'true';
+    return lowercaseValue !== 'off' && lowercaseValue !== '0' && lowercaseValue !== 'false';
   }
-}
+
+ }

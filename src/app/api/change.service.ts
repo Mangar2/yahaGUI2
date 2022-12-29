@@ -43,7 +43,7 @@ export class ChangeService {
   publishChange(topic: string, value: string, pollCount = 5, callback: Function): Subscription {
     const subscription = new Subscription();
     const messageObservable = this.messageService.getMessages(topic, [], false, false, 0)
-    const pollForUpdate = timer(500, 500).pipe(take(pollCount))
+    const pollForUpdate = timer(700, 700).pipe(take(pollCount))
 
     subscription.add(this.messageService.publish(topic, value).subscribe(resp => {
       if (resp.status !== 200 || resp.body !== "puback") {
