@@ -20,6 +20,8 @@ export interface IResponseBody {
     payload: ITopicList | null;
 }
 
+export type HttpMessageResponse = Observable<HttpResponse<IResponseBody>>;
+
 /**
  * Result structure of a publish command
  */
@@ -43,7 +45,7 @@ export class MessagesService {
      * @param levelAmount amount of data level to retrieve
      */
     getMessages(topic: string, nodes: IMessages, history: boolean,
-        reason: boolean = true, levelAmount: number = 1): Observable<HttpResponse<IResponseBody>> {
+        reason: boolean = true, levelAmount: number = 1): HttpMessageResponse {
         // The app uses '|' instead of '/' to get around angular routing, the interface needs '/'
         topic = topic.split('|').join('/')
         const data = {

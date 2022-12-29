@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IHistory, IReasons } from 'src/app/data/message';
+import { IHistory, IHistoryList, IReasons } from 'src/app/data/message';
 import { IStorageNode } from 'src/app/data/message-tree.service';
 import { INavSettings } from 'src/app/settings/settings.service';
 
@@ -15,7 +15,7 @@ export class HistoryComponent {
 
   displayedColumns = ["value", "reason"]
 
-  history: { time: string, reason: string }[] | null = null;
+  history: IHistoryList = [];
 
   get navSettings(): INavSettings | null {
     return this._navSettings;
@@ -34,7 +34,17 @@ export class HistoryComponent {
   @Input()
   set topicNode(topicNode: IStorageNode | null) {
     this._topicNode = topicNode;
-    console.log(this._topicNode);
+    if (this.topicNode && this.topicNode.history) {
+      let curNode: IHistory = { 
+        time: this.topicNode.time, 
+        value: this.topicNode.value, 
+        reason: this.topicNode.reason
+      }
+      const newHistory: IHistoryList = [];
+      newHistory.push(curNode);
+      newHistory.push(...this.topicNode.history);
+      this.history = newHistory;
+    }
   }
 
   /**
@@ -80,8 +90,8 @@ export class HistoryComponent {
     let addDate = true;
     for (const index in reasons) {
       const reason = reasons[index];
-      result = result + spacer + index + '. ' + reason.message;
-      result = result + this.beautifyTimeString(reason.timestamp, addDate);
+      result = result + spacer + (Number(index) + 1) + '. ' + reason.message;
+      result = result + ' (' + this.beautifyTimeString(reason.timestamp, addDate) + ')';
       addDate = false;
       spacer = " ";
     }

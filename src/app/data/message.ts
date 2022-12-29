@@ -44,7 +44,7 @@ export type IMessages = IMessage[]
  */
  export interface IHistory {
     time?: string;
-    value?: string;
+    value?: string | number;
     reason?: IReasons
 }
 

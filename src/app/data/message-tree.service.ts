@@ -22,6 +22,7 @@ import { ITopicData, ITopicList } from './topic_data';
   childs: { [key:string]: IStorageNode } | null,
   topic?: string,
   value?: string | number,
+  time?: string,
   reason?: IReasons,
   history?: IHistoryList,
   debug?: boolean
@@ -31,6 +32,7 @@ class StorageNode implements IStorageNode {
   childs: { [key:string]: StorageNode } | null = null;
   topic?: string;
   value?: string | number;
+  time?: string;
   reason?: IReasons;
   history?: IHistoryList;
   debug?: boolean;
@@ -63,8 +65,12 @@ class StorageNode implements IStorageNode {
   public setValuesFromMessage(topicData: ITopicData) {
     this.topic = topicData.topic;
     this.value = topicData.value;
+    this.time = topicData.time;
     this.reason = topicData.reason;
-    this.history = topicData.history;
+    // Do not delete the old history, if a new call did not provide it
+    if (topicData.history) {
+      this.history = topicData.history;
+    }
   }
 }
 

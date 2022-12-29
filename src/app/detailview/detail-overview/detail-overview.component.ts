@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, take, timer } from 'rxjs';
 import { ChangeService } from 'src/app/api/change.service';
-import { MessagesService } from 'src/app/api/messages.service';
+import { HttpMessageResponse, MessagesService } from 'src/app/api/messages.service';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
+
+const REFRESH_RATE_IN_MILLISECONDS = 2 * 1000;
 
 @Component({
   selector: 'app-detail-overview',
@@ -13,7 +15,7 @@ import { INavSettings, SettingsService } from 'src/app/settings/settings.service
 })
 export class DetailOverviewComponent {
 
-  subscription: Subscription | null = null;
+  subscription: Subscription = new Subscription;
   topicNode: IStorageNode | null = null;
   topicChunks: string[] | null = null;
   navSettings: INavSettings | null = null;
@@ -45,7 +47,8 @@ export class DetailOverviewComponent {
         this.topicChunks = []
       }
       this.navSettings = this.settingsService.getNavSettings(this.topicChunks);
-      this.updateNode(this.topicChunks);
+      this.initializeNode(this.topicChunks);
+      this.pollNode(this.topicChunks);
     })
   }
 
@@ -53,16 +56,49 @@ export class DetailOverviewComponent {
    * Updates the current node and shows the result
    * @param topicChunks path to current node
    */
-  private updateNode(topicChunks: string[]) {
+  private initializeNode(topicChunks: string[]) {
     // Child Depth 1 ensures, that all direct childs are also fetched. The child with the name "set" indicates, that
     // the current node has been changed by a set command -> thus it is a changable parameter and not only an information
     // This will be used for auto-detecting the type of a node
     const CHILD_DEPTH = 1;
-    const messageObservable = this.messagesService.getMessages(topicChunks.join('/'), [], true, true, CHILD_DEPTH);
-    messageObservable.subscribe(resp => {
+    this.requestNewHistoryInfo(topicChunks, CHILD_DEPTH);
+  }
+
+  /**
+   * polls for infos
+   * @param topicChunks path to the current node
+   */
+  private pollNode(topicChunks: string[]) {
+    const topic: string = topicChunks.join('/')
+    const valueObservable = this.messagesService.getMessages(topic, [], false, true, 0)
+
+    const pollForUpdate = timer(REFRESH_RATE_IN_MILLISECONDS, REFRESH_RATE_IN_MILLISECONDS);
+
+    this.subscription.add(pollForUpdate.subscribe( () => {
+      this.subscription.add(valueObservable.subscribe(resp => {
+        const oldTime = this.topicNode?.time;
+        this.messagesTree.setHttpResult(resp);
+        const newNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
+        if (!oldTime || newNode?.time !== oldTime) {
+          console.log("new history request");
+          this.requestNewHistoryInfo(topicChunks);
+        }
+      }))
+    }))
+  }
+
+  /**
+   * 
+   * @param observable observable for the http request
+   * @param topicChunks link to the current node
+   */
+  private requestNewHistoryInfo(topicChunks:string[], depth: number = 0) {
+    const topic: string = topicChunks.join('/')
+    const historyObservable = this.messagesService.getMessages(topic, [], true, true, depth)
+    this.subscription.add(historyObservable.subscribe(resp => {
       this.messagesTree.setHttpResult(resp);
       this.updateView(topicChunks);
-    })
+    }))
   }
 
   /**
@@ -70,7 +106,20 @@ export class DetailOverviewComponent {
    * @param topicChunks elements of the current topic
    */
   private updateView(topicChunks: string[]) {
-    this.topicNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
+    const updatedNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
+    if (!updatedNode) {
+      return;
+    }
+    const newNode : IStorageNode = {
+      childs: updatedNode.childs,
+      topic: updatedNode.topic,
+      value: updatedNode.value,
+      time: updatedNode.time,
+      reason: updatedNode.reason,
+      history: updatedNode.history,
+      debug: updatedNode.debug
+    }
+    this.topicNode = newNode;
   }
 
   /**
@@ -93,12 +142,12 @@ export class DetailOverviewComponent {
     }
     const topic = this.topicChunks.join('/');
     this.isUpdatingTopic = true;
-    this.subscription = this.changeService.publishChange(topic, newValue, 10, () => {
+    this.subscription.add(this.changeService.publishChange(topic, newValue, 10, () => {
       this.topicNode = this.messagesTree.getNodeByTopic(topic);
       if (this.topicNode && this.topicNode.value) {
         this.isUpdatingTopic = false;
       }
-    });
+    }));
   }
 
   /**
