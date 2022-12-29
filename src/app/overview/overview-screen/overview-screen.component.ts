@@ -106,7 +106,7 @@ export class OverviewScreenComponent {
     const additionalTopics = this.settingsService.getAdditionalTopics(topic, topicChunks.length + 1);
     for (const additionalTopic of additionalTopics) {
       const node = this.messagesTree.getNodeByTopic(additionalTopic);
-      if (node && node.value && node.topic) {
+      if (node && node.value !== undefined && node.topic) {
         result.push({
           value: node.value,
           topic: node.topic

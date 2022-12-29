@@ -13,7 +13,7 @@ export class NodeSettingsComponent {
 
   settings: INavSettings | null = null;
 
-  topicTypes = ['Automatic', 'Information', 'Switch', 'Parameter'];
+  topicTypes = ['Automatic', 'Information', 'Switch', 'Light', 'Window', 'Parameter'];
   topicType = 'Automatic';
   
   valueTypes = ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'];

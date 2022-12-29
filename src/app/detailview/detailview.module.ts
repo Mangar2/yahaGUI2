@@ -5,10 +5,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input'; 
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
+import { MatTableModule } from '@angular/material/table'; 
 
 import { DetailOverviewComponent } from './detail-overview/detail-overview.component';
 import { StatusComponent } from './status/status.component';
 import { NodeSettingsComponent } from './node-settings/node-settings.component';
+import { HistoryComponent } from './history/history.component';
 
 
 
@@ -16,14 +18,16 @@ import { NodeSettingsComponent } from './node-settings/node-settings.component';
   declarations: [
     DetailOverviewComponent,
     StatusComponent,
-    NodeSettingsComponent
+    NodeSettingsComponent,
+    HistoryComponent
   ],
   imports: [
     CommonModule,
     MatSelectModule,
     MatInputModule,
     MatSlideToggleModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTableModule
   ]
 })
 export class DetailviewModule { }

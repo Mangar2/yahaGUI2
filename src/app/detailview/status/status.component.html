@@ -10,9 +10,10 @@
         <button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange(topicValueInput.value)">Update
         </button>
     </div>
-    <div *ngIf="topicType === 'Switch'">
+    <div *ngIf="isSwitch()">
         <mat-slide-toggle (change)="onChange($event)" [checked]="isSwitchOn()">
         </mat-slide-toggle>
+        <span class="status-value">{{topicValue}}</span>
     </div>
     <div class="spinner-box" *ngIf="isUpdatingTopic">
         <mat-spinner diameter="40" strokeWidth="10"></mat-spinner>

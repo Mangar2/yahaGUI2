@@ -58,7 +58,7 @@ export class DetailOverviewComponent {
     // the current node has been changed by a set command -> thus it is a changable parameter and not only an information
     // This will be used for auto-detecting the type of a node
     const CHILD_DEPTH = 1;
-    const messageObservable = this.messagesService.getMessages(topicChunks.join('/'), [], false, false, CHILD_DEPTH);
+    const messageObservable = this.messagesService.getMessages(topicChunks.join('/'), [], true, true, CHILD_DEPTH);
     messageObservable.subscribe(resp => {
       this.messagesTree.setHttpResult(resp);
       this.updateView(topicChunks);

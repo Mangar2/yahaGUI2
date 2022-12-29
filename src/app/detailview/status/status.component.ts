@@ -25,11 +25,6 @@ export class StatusComponent {
     this.valueType = SettingDecisions.decideValueType("", "");
   }
 
-
-  get navSettings(): INavSettings | null {
-    return this._navSettings;
-  }
-
   private capitalizeFirstLetter(text: string) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
@@ -51,7 +46,11 @@ export class StatusComponent {
     }
     return result;
   }
+
   
+  get navSettings(): INavSettings | null {
+    return this._navSettings;
+  }
 
   @Input()
   set navSettings(navSettings: INavSettings | null) {
@@ -70,7 +69,7 @@ export class StatusComponent {
   }
 
   ngOnChanges() {
-    if (this.navSettings && this.topicNode && this.topicNode.topic && this.topicNode.value) {
+    if (this.navSettings && this.topicNode && this.topicNode.topic && this.topicNode.value !== undefined) {
       const topicChunks = this.topicNode.topic.split('/');
       const nodeName = topicChunks.at(-1);
       this.topicName = nodeName ? nodeName : 'Unknown, an error occured';
@@ -96,6 +95,14 @@ export class StatusComponent {
       return;
     }
     this.valueChangeEvent.emit(newValue);
+  }
+
+  /**
+   * Checks, if an item is a switch
+   * @returns true, if the item is a switch
+   */
+  isSwitch() {
+    return SettingDecisions.isSwitch(this.topicType, this.topicValue);
   }
 
   /**

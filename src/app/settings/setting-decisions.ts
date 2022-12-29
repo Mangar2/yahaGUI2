@@ -19,7 +19,7 @@ export class SettingDecisions {
    */
   static isSwitch(topicType: string, topicValue: string | number | null): boolean {
     let result = false;
-    if (topicType === 'Switch') {
+    if (topicType === 'Switch' || topicType === 'Light') {
       result = true;
     } else if (topicType === 'Automatic' && topicValue) {
       const lowercaseValue = String(topicValue).toLowerCase();
