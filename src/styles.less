@@ -11,24 +11,20 @@ body {
 
 .container {
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: column;
+    align-items: stretch;
 }
 
-app-nav,
 app-footer {
     padding: 20px;
     margin: 5px;
+    width: 1024;
 }
 
 app-header {
     order: 1;
-    flex: 100%;
-}
-
-app-nav {
-    order: 4;
-    flex: 0 1 200px;
-    background: rgb(176, 165, 199);
+    width: 1024;
+    flex-basis: auto;
 }
 
 app-overview-screen,
@@ -36,7 +32,6 @@ app-detail-overview {
     display: flex;
     justify-content: flex-start;
     order: 3;
-    flex: 1;
     min-height: 500px;
     margin: 5px;
 }

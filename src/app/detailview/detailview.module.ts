@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
 import { MatTableModule } from '@angular/material/table'; 
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { DetailOverviewComponent } from './detail-overview/detail-overview.component';
 import { StatusComponent } from './status/status.component';
@@ -27,7 +28,8 @@ import { HistoryComponent } from './history/history.component';
     MatInputModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
-    MatTableModule
+    MatTableModule,
+    MatPaginatorModule
   ]
 })
 export class DetailviewModule { }

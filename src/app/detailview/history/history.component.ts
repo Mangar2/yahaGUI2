@@ -1,4 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator'
+import { MatTableDataSource } from '@angular/material/table';
 import { IHistory, IHistoryList, IReasons } from 'src/app/data/message';
 import { IStorageNode } from 'src/app/data/message-tree.service';
 import { INavSettings } from 'src/app/settings/settings.service';
@@ -8,14 +10,19 @@ import { INavSettings } from 'src/app/settings/settings.service';
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.less']
 })
-export class HistoryComponent {
+export class HistoryComponent implements AfterViewInit {
 
   _navSettings: INavSettings | null = null;
   _topicNode: IStorageNode | null = null;
 
   displayedColumns = ["value", "reason"]
+  dataSource = new MatTableDataSource<IHistory>([]);
 
-  history: IHistoryList = [];
+  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
 
   get navSettings(): INavSettings | null {
     return this._navSettings;
@@ -43,7 +50,8 @@ export class HistoryComponent {
       const newHistory: IHistoryList = [];
       newHistory.push(curNode);
       newHistory.push(...this.topicNode.history);
-      this.history = newHistory;
+      this.dataSource = new MatTableDataSource<IHistory>(newHistory);
+      this.dataSource.paginator = this.paginator;
     }
   }
 

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, take, timer } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import { ChangeService } from 'src/app/api/change.service';
-import { HttpMessageResponse, MessagesService } from 'src/app/api/messages.service';
+import { MessagesService } from 'src/app/api/messages.service';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
