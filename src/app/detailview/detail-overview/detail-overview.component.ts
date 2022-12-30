@@ -1,12 +1,32 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Overview Controller-Component giving a detail view to a topic. It organizes data and includes
+ * all views.
+ * This controller polls for updates. In the normal cycle, it 
+ * - Checks every every timespan for the current value including the last message timestamp
+ * - Requests a full update (including history), if there is an information with newer timestamp
+ * If the value has been changed, a change detection starts, it
+ * - Checks more often (every 700ms) for an update 
+ * - Stops, once the new value is reported by the server (and thus successfully applied)
+ * - Prevents the normal update cycle until the requested value change has been found
+ */
+
+
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, timer } from 'rxjs';
 import { ChangeService } from 'src/app/api/change.service';
 import { MessagesService } from 'src/app/api/messages.service';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
+import { GlobalSettingsService } from 'src/app/settings/global-settings.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
-const REFRESH_RATE_IN_MILLISECONDS = 2 * 1000;
 
 @Component({
   selector: 'app-detail-overview',
@@ -25,6 +45,7 @@ export class DetailOverviewComponent {
     private messagesService: MessagesService,
     private messagesTree: MessageTreeService,
     private settingsService: SettingsService,
+    private globalSettings: GlobalSettingsService,
     private changeService: ChangeService,
     private route: ActivatedRoute) {
   }
@@ -71,10 +92,14 @@ export class DetailOverviewComponent {
   private pollNode(topicChunks: string[]) {
     const topic: string = topicChunks.join('/')
     const valueObservable = this.messagesService.getMessages(topic, [], false, true, 0)
-
-    const pollForUpdate = timer(REFRESH_RATE_IN_MILLISECONDS, REFRESH_RATE_IN_MILLISECONDS);
+    const refreshRateInMilliseconds = this.globalSettings.getDetailViewRefreshInMilliseconds();
+    const pollForUpdate = timer(refreshRateInMilliseconds, refreshRateInMilliseconds);
 
     this.subscription.add(pollForUpdate.subscribe( () => {
+      // We do not poll for updates, if there is a value change polling already running
+      if (this.isUpdatingTopic) {
+        return;
+      }
       this.subscription.add(valueObservable.subscribe(resp => {
         const oldTime = this.topicNode?.time;
         this.messagesTree.setHttpResult(resp);
@@ -110,15 +135,10 @@ export class DetailOverviewComponent {
     if (!updatedNode) {
       return;
     }
-    const newNode : IStorageNode = {
-      childs: updatedNode.childs,
-      topic: updatedNode.topic,
-      value: updatedNode.value,
-      time: updatedNode.time,
-      reason: updatedNode.reason,
-      history: updatedNode.history,
-      debug: updatedNode.debug
-    }
+    // We copy the node to enable automatic updating of the view
+    // Just assigning the node might just keep the node-reference and is thus
+    // not identified as an update
+    const newNode : IStorageNode = {...updatedNode}
     this.topicNode = newNode;
   }
 
@@ -141,8 +161,9 @@ export class DetailOverviewComponent {
       return;
     }
     const topic = this.topicChunks.join('/');
+    const valueChangePollAmount = this.globalSettings.getValueChangePollAmount();
     this.isUpdatingTopic = true;
-    this.subscription.add(this.changeService.publishChange(topic, newValue, 10, () => {
+    this.subscription.add(this.changeService.publishChange(topic, newValue, valueChangePollAmount, () => {
       this.topicNode = this.messagesTree.getNodeByTopic(topic);
       if (this.topicNode && this.topicNode.value) {
         this.isUpdatingTopic = false;
