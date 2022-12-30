@@ -5,40 +5,49 @@
 body {
     margin: 0;
     padding: 0;
-    text-align: center;
     font-family: sans-serif;
 }
 
+html, body, app-root {
+    width: 100%;
+    height: 100%;
+}
+
+app-root {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+}
+
 .container {
+    min-height: 100%;
+    flex-basis: 1400px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
 }
 
-app-footer {
-    padding: 20px;
-    margin: 5px;
-    width: 1024;
-}
-
 app-header {
-    order: 1;
-    width: 1024;
-    flex-basis: auto;
+    flex-shrink: 0;
+    flex-basis: 100%;
 }
 
 app-overview-screen,
 app-detail-overview {
     display: flex;
-    justify-content: flex-start;
-    order: 3;
-    min-height: 500px;
-    margin: 5px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    flex-grow: 1;
 }
 
 app-footer {
-    order: 5;
-    height: 100px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    margin: 5px;
     flex: 0 1 100%;
-    background: rgb(119, 120, 121);
+    background: rgb(202, 217, 233);
 }

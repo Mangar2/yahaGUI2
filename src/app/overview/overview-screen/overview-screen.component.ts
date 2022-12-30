@@ -1,9 +1,23 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Overview Controller-Component giving an overview over all topics
+ * This controller polls for updates.  
+ */
+
 import { Component } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { Subscription, timer } from 'rxjs';
 import { MessagesService } from 'src/app/api/messages.service';
 import { IMessages } from 'src/app/data/message';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { ITopicList } from 'src/app/data/topic_data';
+import { GlobalSettingsService } from 'src/app/settings/global-settings.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
@@ -18,11 +32,14 @@ export class OverviewScreenComponent {
   navItems: string[] = []
   messages: IMessages = [];
   settings: INavSettings | null = null;
+  subscription: Subscription = new Subscription;
+  isUpdatingTopic: boolean = false;
 
   constructor(
     private messagesService: MessagesService,
     private messagesTree: MessageTreeService,
     private settingsService: SettingsService,
+    private globalSettings: GlobalSettingsService,
     private router: Router,
     private route: ActivatedRoute) {
   }
@@ -30,8 +47,9 @@ export class OverviewScreenComponent {
   /**
    */
   ngOnInit() {
-    this.requestMessages();
+    this.requestMessages([]);
     this.subscribeToQueryParameter();
+    this.pollNode();
   }
 
   /**
@@ -52,14 +70,32 @@ export class OverviewScreenComponent {
   /**
    * Subscribes to the api to get message data
    */
-  private requestMessages(): void {
-    this.messagesService.getMessages('', [], false, false, 7).subscribe(data => {
+  private requestMessages(topicChunks: string[]): void {
+    const topic = topicChunks.join('/')
+    this.subscription.add(this.messagesService.getMessages(topic, [], false, false, 7).subscribe(data => {
       if (data.body && data.body.payload) {
         const topicList: ITopicList = data.body.payload;
         this.messagesTree.replaceManyNodes(topicList);
         this.updateView(this.topicChunks);
       }
-    })
+    }))
+  }
+
+  /**
+   * polls for infos
+   * @param topicChunks path to the current node
+   */
+  private pollNode() {
+    const refreshRateInMilliseconds = this.globalSettings.getOverviewRefreshInMilliseconds();
+    const pollForUpdate = timer(refreshRateInMilliseconds, refreshRateInMilliseconds);
+
+    this.subscription.add(pollForUpdate.subscribe(() => {
+      // We do not poll for updates, if there is a value change polling already running
+      if (this.isUpdatingTopic) {
+        return;
+      }
+      this.requestMessages(this.topicChunks);
+    }))
   }
 
   /**
@@ -127,7 +163,7 @@ export class OverviewScreenComponent {
     for (const topicChunk in childs) {
       const child = childs[topicChunk];
       if (child.value !== undefined && child.topic && settings.isEnabled(topicChunk)) {
-        topics.push ({
+        topics.push({
           value: child.value,
           topic: child.topic
         })
@@ -165,5 +201,14 @@ export class OverviewScreenComponent {
    */
   public onConfigChange() {
     this.updateView(this.topicChunks);
+  }
+
+  /**
+   * We need to unsubscribe to everything before leaving this view
+   */
+  ngOnDestroy() {
+    if (this.subscription !== null) {
+      this.subscription.unsubscribe();
+    }
   }
 }

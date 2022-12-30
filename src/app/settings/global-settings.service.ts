@@ -18,6 +18,7 @@ export class GlobalSettingsService {
 
   settings = {
     detail_View_Refresh_In_Milliseconds: 2 * 1000,
+    overview_Refresh_In_Milliseconds: 2 * 1000,
     vaue_Change_Poll_Amount: 15
   }
 
@@ -35,6 +36,10 @@ export class GlobalSettingsService {
 
   getDetailViewRefreshInMilliseconds() {
     return this.settings.detail_View_Refresh_In_Milliseconds;
+  }
+
+  getOverviewRefreshInMilliseconds() {
+    return this.settings.overview_Refresh_In_Milliseconds;
   }
 
   getValueChangePollAmount() {

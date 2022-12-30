@@ -1,3 +1,13 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ */
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -8,7 +18,6 @@ import { MatIconModule } from '@angular/material/icon'
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
-import { NavComponent } from './nav/nav.component';
 
 
 
@@ -16,8 +25,7 @@ import { NavComponent } from './nav/nav.component';
   declarations: [
     SidenavComponent,
     HeaderComponent,
-    FooterComponent,
-    NavComponent
+    FooterComponent
   ],
   imports: [
     CommonModule,
@@ -28,8 +36,7 @@ import { NavComponent } from './nav/nav.component';
   exports: [
     SidenavComponent,
     HeaderComponent,
-    FooterComponent,
-    NavComponent
+    FooterComponent
   ]
 })
 export class NavModule { }
