@@ -90,6 +90,14 @@ export class TopicsComponent {
     return null;
   }
 
+  trimString(str: string | number, maxLen: number = 45): string {
+    let result = String(str);
+    if (result.length > maxLen) {
+      result = result.slice(0, maxLen - 4) + '...';
+    }
+    return result;
+  }
+
   /**
    * Gets a value of a topic
    * @param topic topic to get the value
