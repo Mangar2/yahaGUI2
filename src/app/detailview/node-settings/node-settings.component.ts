@@ -1,4 +1,16 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Overview Form Component providing settings for the node
+ */
+
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { GlobalSettingsService } from 'src/app/settings/global-settings.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
@@ -13,18 +25,11 @@ export class NodeSettingsComponent {
 
   settings: INavSettings | null = null;
 
-  topicTypes = ['Automatic', 'Information', 'Switch', 'Light', 'Window', 'Parameter'];
-  topicType = 'Automatic';
-  
-  valueTypes = ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'];
-  valueType = 'Automatic';
+  settingOptions = this.globalSettings.getSettingOptions()
 
-  topicRanks = ['Automatic', 1, 2, 3, 4, 5]
-  topicRank = 'Automatic';
-
-  topicPicture = 'Automatic';
-
-  constructor(private settingService: SettingsService) {
+  constructor(
+    private settingService: SettingsService,
+    private globalSettings: GlobalSettingsService) {
   }
 
   ngOnChanges() {
@@ -40,16 +45,16 @@ export class NodeSettingsComponent {
    * Updates members on settings change
    */
   update(settings: INavSettings) {
-    this.topicType = settings.getTopicType();
-    this.valueType = settings.getValueType();
-    this.topicRank = String(settings.getTopicRank());
+    this.settingOptions.topicType = settings.getTopicType();
+    this.settingOptions.valueType = settings.getValueType();
+    this.settingOptions.topicRank = String(settings.getTopicRank());
   }
 
   /**
    * Sets the topic type to the setting store
    */
   onSelectTopic() {
-    this.settings?.setTopicType(this.topicType);
+    this.settings?.setTopicType(this.settingOptions.topicType);
     this.settingService.writeToLocalStore();
     this.settingChangeEvent.emit();
   }
@@ -58,7 +63,7 @@ export class NodeSettingsComponent {
    * Sets the type of the current value
    */
     onSelectValueType() {
-      this.settings?.setValueType(this.valueType);
+      this.settings?.setValueType(this.settingOptions.valueType);
       this.settingService.writeToLocalStore();
       this.settingChangeEvent.emit();
     }
@@ -67,7 +72,7 @@ export class NodeSettingsComponent {
    * Sets the rank to the setting store
    */
   onSelectRank() {
-    this.settings?.setTopicRank(this.topicRank);
+    this.settings?.setTopicRank(this.settingOptions.topicRank);
     this.settingService.writeToLocalStore();
     this.settingChangeEvent.emit();
   }

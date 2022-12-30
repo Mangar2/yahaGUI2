@@ -1,3 +1,14 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Overview View Component showing a history-table with paginator
+ */
+
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator'
 import { MatTableDataSource } from '@angular/material/table';
@@ -42,17 +53,28 @@ export class HistoryComponent implements AfterViewInit {
   set topicNode(topicNode: IStorageNode | null) {
     this._topicNode = topicNode;
     if (this.topicNode && this.topicNode.history) {
-      let curNode: IHistory = { 
-        time: this.topicNode.time, 
-        value: this.topicNode.value, 
-        reason: this.topicNode.reason
-      }
-      const newHistory: IHistoryList = [];
-      newHistory.push(curNode);
-      newHistory.push(...this.topicNode.history);
-      this.dataSource = new MatTableDataSource<IHistory>(newHistory);
-      this.dataSource.paginator = this.paginator;
+      this.updateHistory(this.topicNode);
     }
+  }
+
+  /**
+   * Updates the history data as input for the table and its paginator
+   * @param topicNode data node of the current topic
+   */
+  private updateHistory(topicNode: IStorageNode) {
+    if (!topicNode.history) {
+      return;
+    }
+    let curNode: IHistory = { 
+      time: topicNode.time, 
+      value: topicNode.value, 
+      reason: topicNode.reason
+    }
+    const newHistory: IHistoryList = [];
+    newHistory.push(curNode);
+    newHistory.push(...topicNode.history);
+    this.dataSource = new MatTableDataSource<IHistory>(newHistory);
+    this.dataSource.paginator = this.paginator;
   }
 
   /**
@@ -60,7 +82,7 @@ export class HistoryComponent implements AfterViewInit {
    * @param date date to check
    * @returns true, if the date is today
    */
-  isToday(date: Date): boolean {
+  private isToday(date: Date): boolean {
     let todaysDate = new Date();
     return date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
   }

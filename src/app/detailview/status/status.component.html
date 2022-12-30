@@ -1,5 +1,6 @@
 <div class="status-box">
-    <span class="status-headline">{{topicName}}</span>
+    <span class="status-headline">{{beautifiedTopicName}}</span>
+    <span class="status-truename">{{topicName}}</span>
     <span class="status-value" *ngIf="topicType === 'Information'">{{topicValue}}</span>
     <div class="status-box" *ngIf="topicType === 'Parameter'">
         <mat-form-field>

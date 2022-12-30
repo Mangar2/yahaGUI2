@@ -21,6 +21,16 @@ export class GlobalSettingsService {
     vaue_Change_Poll_Amount: 15
   }
 
+  settingOptions = {
+    topicType: 'Automatic',
+    topicTypes: ['Automatic', 'Information', 'Switch', 'Light', 'Window', 'Parameter'],
+    valueType: 'Automatic',
+    valueTypes: ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'],
+    topicRank: 'Automatic',
+    topicRanks: ['Automatic', 1, 2, 3, 4, 5],
+    topicPicture: 'Automatic'
+  }
+
   constructor() { }
 
   getDetailViewRefreshInMilliseconds() {
@@ -29,6 +39,10 @@ export class GlobalSettingsService {
 
   getValueChangePollAmount() {
     return this.settings.vaue_Change_Poll_Amount;
+  }
+
+  getSettingOptions() {
+    return this.settingOptions;
   }
 
 }

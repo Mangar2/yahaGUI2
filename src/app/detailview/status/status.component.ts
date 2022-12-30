@@ -1,5 +1,18 @@
+/**
+ * @license
+ * This software is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 3. It is furnished
+ * "as is", without any support, and with no warranty, express or implied, as to its usefulness for
+ * any purpose.
+ *
+ * @author Volker Böhm
+ * @copyright Copyright (c) 2023 Volker Böhm
+ * @Overview View Component showing the name and current value of the node. It additionally provides
+ * the ability to change the current value and inform his controller about this change
+ */
+
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IStorageNode } from 'src/app/data/message-tree.service';
+import { DisplaynameService } from 'src/app/settings/displayname.service';
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
 import { INavSettings } from 'src/app/settings/settings.service';
 
@@ -16,17 +29,14 @@ export class StatusComponent {
   topicType: string;
   valueType: string;
   topicName: string = "";
+  beautifiedTopicName: string = "";
   topicValue: string = "";
   _navSettings: INavSettings | null = null;
   _topicNode: IStorageNode | null = null;
 
-  constructor() {
+  constructor(private displaynameService: DisplaynameService) {
     this.topicType = SettingDecisions.decideType("", "");
     this.valueType = SettingDecisions.decideValueType("", "");
-  }
-
-  private capitalizeFirstLetter(text: string) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
   /**
@@ -73,7 +83,7 @@ export class StatusComponent {
       const topicChunks = this.topicNode.topic.split('/');
       const nodeName = topicChunks.at(-1);
       this.topicName = nodeName ? nodeName : 'Unknown, an error occured';
-      this.topicName = this.capitalizeFirstLetter(this.topicName);
+      this.beautifiedTopicName = this.displaynameService.deriveDisplayName(topicChunks);
       this.topicValue = this.topicNode.value.toString();
       this.topicType = SettingDecisions.decideType(this.navSettings.getTopicType(), this.topicValue);
       this.valueType = SettingDecisions.decideValueType(this.navSettings.getValueType(), this.topicValue);

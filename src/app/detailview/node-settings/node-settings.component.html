@@ -1,20 +1,20 @@
 <div class="settings-box">
     <mat-form-field appearance="fill">
         <mat-label>Select topic type</mat-label>
-        <mat-select [(value)]="topicType" (selectionChange)="onSelectTopic()">
-            <mat-option *ngFor="let type of topicTypes" value="{{type}}">{{type}}</mat-option>
+        <mat-select [(value)]="settingOptions.topicType" (selectionChange)="onSelectTopic()">
+            <mat-option *ngFor="let type of settingOptions.topicTypes" value="{{type}}">{{type}}</mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field *ngIf="topicType === 'Parameter'" topic appearance="fill">
+    <mat-form-field *ngIf="settingOptions.topicType === 'Parameter'" topic appearance="fill">
         <mat-label>Select value type</mat-label>
-        <mat-select [(value)]="valueType" (selectionChange)="onSelectValueType()">
-            <mat-option *ngFor="let type of valueTypes" value="{{type}}">{{type}}</mat-option>
+        <mat-select [(value)]="settingOptions.valueType" (selectionChange)="onSelectValueType()">
+            <mat-option *ngFor="let type of settingOptions.valueTypes" value="{{type}}">{{type}}</mat-option>
         </mat-select>
     </mat-form-field>
     <mat-form-field appearance="fill">
         <mat-label>Select topic rank</mat-label>
-        <mat-select [(value)]="topicRank" (selectionChange)="onSelectRank()">
-            <mat-option *ngFor="let rank of topicRanks" value="{{rank}}">{{rank}}</mat-option>
+        <mat-select [(value)]="settingOptions.topicRank" (selectionChange)="onSelectRank()">
+            <mat-option *ngFor="let rank of settingOptions.topicRanks" value="{{rank}}">{{rank}}</mat-option>
         </mat-select>
     </mat-form-field>
 </div>
