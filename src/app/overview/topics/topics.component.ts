@@ -7,9 +7,6 @@
  * @author Volker Böhm
  * @copyright Copyright (c) 2023 Volker Böhm
  * @Overview View component showing an overview of the relevant topics for the current node
- * It also has the ability to switch a value for "switch" topics. This is currently done by
- * the controller itself:
- * ToDo: move the poll for value feature to the controller-component by using an event emitter
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
@@ -21,6 +18,10 @@ import { Subscription } from 'rxjs'
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
 import { DisplaynameService } from 'src/app/settings/displayname.service';
 
+export type IValueChangeInfo = {
+  topic: string,
+  value: string
+}
 
 @Component({
   selector: 'app-topics',
@@ -30,10 +31,13 @@ import { DisplaynameService } from 'src/app/settings/displayname.service';
 export class TopicsComponent {
 
   @Input() messages: IMessages | null = null;
-  @Output() valueChangeEvent = new EventEmitter<string>();
+  @Input() topicChunks: string[] = [];
+  @Input() updatingTopics: { [index:string]: boolean } = {};
+
+  @Output() valueChangeEvent = new EventEmitter<IValueChangeInfo>();
 
   subscription: Subscription | null = null;
-  updatingTopics: { [index:string]: boolean } = {};
+
 
   constructor(
     private settingsService: SettingsService,
@@ -71,7 +75,7 @@ export class TopicsComponent {
    * @returns name of the topic
    */
   getName(topic: string): string {
-    return this.displaynameService.deriveDisplayName(topic.split('/'));
+    return this.displaynameService.deriveDisplayName(topic.split('/'), this.topicChunks);
   }
 
   /**
@@ -156,19 +160,7 @@ export class TopicsComponent {
   onChange(topic: string, event: any): void {
     const newValue = event.checked ? 'on' : 'off';
     event.source.checked = !event.checked;
-    this.valueChangeEvent.emit(topic);
-    if (this.updatingTopics[topic] === true) {
-      return;
-    }
-    this.updatingTopics[topic] = true;
-    this.subscription = this.changeService.publishChange(topic, newValue, 10, () => { 
-      const curValue = this.changeService.getValueFromTopic(topic);
-      if (curValue) {
-        event.source.checked = curValue === 'on';
-        this.setValue(topic, curValue);
-        this.updatingTopics[topic] = false;
-      }
-    });
+    this.valueChangeEvent.emit({ topic, value: newValue });
   }
 
   /**

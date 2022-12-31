@@ -20,12 +20,17 @@ Enabling the module with a2enmod and restart apache (it will copy the rewrite.lo
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 ```
+
+Show enabled modules (to doublecheck):
+```
+sudo apache2ctl -M
+```
  
 Now enable the usage of .htaccess file for the virtual host you are using it is by default in ./sites-available/000-default.conf
 ```
 sudo nano /etc/apache2/sites-available/000-default.conf
 ```
-now copy the following code directly in front of the closing tag \<VirtualHost>
+copy the following code directly in front of the closing tag \<VirtualHost>
 ```
 <Directory /var/www/html>
         Options Indexes FollowSymLinks MultiViews

@@ -3,5 +3,7 @@
     <app-sidenav [navItems]="navItems" [topicChunks]="topicChunks" (navItemEvent)="selectItem($event)"
         (configChangeEvent)="onConfigChange()">
     </app-sidenav>
-    <app-topics [messages]="messages"></app-topics>
+    <app-topics [messages]="messages" [topicChunks]="topicChunks" [updatingTopics]="updatingTopics" 
+        (valueChangeEvent)="onValueChange($event)">
+    </app-topics>
 </main>

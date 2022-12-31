@@ -13,12 +13,14 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { Subscription, timer } from 'rxjs';
+import { ChangeService } from 'src/app/api/change.service';
 import { MessagesService } from 'src/app/api/messages.service';
 import { IMessages } from 'src/app/data/message';
 import { IStorageNode, MessageTreeService } from 'src/app/data/message-tree.service';
 import { ITopicList } from 'src/app/data/topic_data';
 import { GlobalSettingsService } from 'src/app/settings/global-settings.service';
 import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
+import { IValueChangeInfo } from '../topics/topics.component';
 
 @Component({
   selector: 'app-overview-screen',
@@ -33,11 +35,12 @@ export class OverviewScreenComponent {
   messages: IMessages = [];
   settings: INavSettings | null = null;
   subscription: Subscription = new Subscription;
-  isUpdatingTopic: boolean = false;
+  updatingTopics: { [index:string]: boolean } = {};
 
   constructor(
     private messagesService: MessagesService,
     private messagesTree: MessageTreeService,
+    private changeService: ChangeService,
     private settingsService: SettingsService,
     private globalSettings: GlobalSettingsService,
     private router: Router,
@@ -91,10 +94,16 @@ export class OverviewScreenComponent {
 
     this.subscription.add(pollForUpdate.subscribe(() => {
       // We do not poll for updates, if there is a value change polling already running
-      if (this.isUpdatingTopic) {
-        return;
+      let alreadyUpdating = false;
+      for (const key in this.updatingTopics) {
+        if (this.updatingTopics[key] === true) {
+          alreadyUpdating = true;
+          break;
+        }
       }
-      this.requestMessages(this.topicChunks);
+      if (!alreadyUpdating) {
+        this.requestMessages(this.topicChunks);
+      }
     }))
   }
 
@@ -201,6 +210,25 @@ export class OverviewScreenComponent {
    */
   public onConfigChange() {
     this.updateView(this.topicChunks);
+  }
+
+  /**
+   * Called, when a value change is requested and we wait for an answer
+   * @param topic topic the value change is requested for
+   */
+  public onValueChange(valueChange: IValueChangeInfo) {
+    //return;
+    if (this.updatingTopics[valueChange.topic] === true) {
+      return;
+    }
+    this.updatingTopics[valueChange.topic] = true;
+    this.subscription.add(this.changeService.publishChange(valueChange.topic, valueChange.value, 10, () => { 
+      if (this.curNode) {
+        this.setMessages(this.curNode, this.topicChunks);
+      }
+      this.updatingTopics[valueChange.topic] = false;
+
+    }));
   }
 
   /**
