@@ -3,13 +3,16 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    flex-basis: 100%;
+    max-width: 100%;
 }
 
-.status-value > span {
+.status-value {
     font-weight: 600;
     font-size: 18px;
     color: black;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .status-headline {

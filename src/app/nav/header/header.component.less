@@ -5,31 +5,47 @@
 .nav-box {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
+    flex-grow: 100%;
+    overflow: hidden;
     height: 40px;
     border-radius: 5px;
     background-color: rgb(238, 238, 238);
     margin-top: 10px;
     margin-bottom: 10px;
-    padding-left: 10px;
+}
+
+.nav-box > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: no-wrap;
+    flex-grow: 0;
 }
 
 .nav-box > div > button {
-    height: 33px;
+    height: 30px;
     border-radius: 5px;
     border: none;
     font-family: "MS Shell Dlg 2";
     font-size: 16px;
     font-weight: 400;
-    color: rgb(0, 123, 255)
-
+    color: rgb(0, 123, 255);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 .nav-box > div > span {
-    margin-left : 5px;
-    margin-right : 5px;
+    height: 30px;
+    line-height: 32px;
     font-weight: 700;
     color: darkgray;
     font-size: 16px;
+    margin-left: 3px;
+    margin-right: 3px;    
 }

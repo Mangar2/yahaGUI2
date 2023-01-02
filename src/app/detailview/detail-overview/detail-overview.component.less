@@ -1,11 +1,20 @@
 main {
     display: flex;
     flex-direction: row;
-    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    width: 100%;
+    gap: 5px;
+}
+
+app-status {
+    display: flex;
 }
 
 app-node-settings {
+    flex-shrink: 1;
     flex-grow: 1;
+    max-height: 200px;
 }
 
 main > div {
@@ -16,9 +25,10 @@ main > div {
     flex-grow: 4;
     flex-shrink: 0;
     flex-basis: 80%;
+    padding-left: 5px;
+    padding-right: 5px;
     background-color: rgb(245, 244, 244);
-    padding-left: 10px;
-    padding-right: 10px;
+    max-width: 100%;
 }
 
 .history-box {

@@ -2,8 +2,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill,minmax(320px, 1fr));
     padding-top: 8px;
-    padding-left: 10px;
-
+    gap: 6px;
 }
 
 .card-box > button {
@@ -17,12 +16,12 @@
     padding-right: 1em;
     padding-top: 10px;
     padding-bottom: 10px;
-    margin-bottom: 6px;
-    margin-right: 6px;
     border: 1px solid rgba(0,0,0,.125);
     background-color: #f8f9fa;
     font-weight: 400;
     color: #495057;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .card-box :hover {
@@ -31,10 +30,12 @@
 
 .card-topic {
     font-size: 16px;
+    text-overflow: ellipsis;
 }
 
 .card-value {
     font-size: 14px;
+    text-overflow: ellipsis;
 }
 
 .text-info-box {
