@@ -29,13 +29,14 @@ export class StatusComponent {
   topicType: string;
   valueType: string;
   topicName: string = "";
+  topicUnit: string = "";
   beautifiedTopicName: string = "";
   topicValue: string = "";
   _navSettings: INavSettings | null = null;
   _topicNode: IStorageNode | null = null;
 
   constructor(private displaynameService: DisplaynameService) {
-    this.topicType = SettingDecisions.decideType("", "");
+    this.topicType = SettingDecisions.decideType("", "", "");
     this.valueType = SettingDecisions.decideValueType("", "");
   }
 
@@ -85,7 +86,8 @@ export class StatusComponent {
       this.topicName = nodeName ? nodeName : 'Unknown, an error occured';
       this.beautifiedTopicName = this.displaynameService.deriveDisplayName(topicChunks);
       this.topicValue = this.topicNode.value.toString();
-      this.topicType = SettingDecisions.decideType(this.navSettings.getTopicType(), this.topicValue);
+      this.topicType = SettingDecisions.decideType(this.navSettings.getTopicType(), nodeName, this.topicValue);
+      this.topicUnit = SettingDecisions.getUnit(this.topicType);
       this.valueType = SettingDecisions.decideValueType(this.navSettings.getValueType(), this.topicValue);
       if (this.navSettings.getTopicType() === 'Automatic' && this.topicType === 'Information' && this.isUpdatable(this.topicNode)) {
         this.topicType = 'Parameter';

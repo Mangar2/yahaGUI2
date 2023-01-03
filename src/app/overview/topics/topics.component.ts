@@ -13,7 +13,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { IMessage, IMessages } from 'src/app/data/message';
 import { SettingsService } from 'src/app/settings/settings.service';
-import { ChangeService } from 'src/app/api/change.service';
 import { Subscription } from 'rxjs'
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
 import { DisplaynameService } from 'src/app/settings/displayname.service';
@@ -41,7 +40,6 @@ export class TopicsComponent {
 
   constructor(
     private settingsService: SettingsService,
-    private changeService: ChangeService,
     private displaynameService: DisplaynameService,
     private router: Router) {
   }
@@ -170,6 +168,19 @@ export class TopicsComponent {
     if (this.subscription !== null) {
       this.subscription.unsubscribe();
     }
+  }
+
+  /**
+   * Gets the unit string of the topic value
+   * @returns unit string
+   */
+  getUnit(topic: string): string {
+    const topicChunks = topic.split('/');
+    const lastChunk = topicChunks.at(-1);
+    const navSettings = this.settingsService.getNavSettings(topic.split('/'));
+    const topicType = SettingDecisions.decideType(navSettings.getTopicType(), lastChunk, null);
+    const topicUnit = SettingDecisions.getUnit(topicType);
+    return topicUnit;
   }
 
 

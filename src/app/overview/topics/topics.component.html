@@ -2,7 +2,9 @@
     <button *ngFor="let message of messages" (click)="viewDetails(message.topic)">
         <div class="text-info-box">
             <span class="card-topic">{{getName(message.topic)}}</span>
-            <span class="card-value" *ngIf="!isSwitch(message.topic)">{{trimString(message.value)}}</span>
+            <span class="card-value" *ngIf="!isSwitch(message.topic)">
+                {{trimString(message.value)}} {{getUnit(message.topic)}}
+            </span>
             <div *ngIf="isSwitch(message.topic)">
                 <mat-slide-toggle (click)="stopPropagation($event)" (change)="onChange(message.topic, $event)"
                     [checked]="isSwitchOn(message.topic)">

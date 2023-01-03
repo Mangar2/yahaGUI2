@@ -11,6 +11,7 @@
 
 import { Injectable } from '@angular/core';
 import { IStorageNode, MessageTreeService } from '../data/message-tree.service';
+import { SettingDecisions } from './setting-decisions';
 import { SettingsService } from './settings.service';
 
 @Injectable({
@@ -18,10 +19,7 @@ import { SettingsService } from './settings.service';
 })
 export class DisplaynameService {
 
-  unitPostFixes = {
-    " in celsius": '°C',
-    " in percent": '%rH'
-  }
+  typesUsedForNameing = ['Window', 'Light', 'Temperature', 'Humidity', 'Roller'];
 
   constructor(
     private messageTree: MessageTreeService,
@@ -132,30 +130,14 @@ export class DisplaynameService {
    * @returns A configured topic type
    */
   private deriveNameBasedOnTopicType(topicChunks: string[]): string {
-    const topicType = this.settingsService.getNavSettings(topicChunks).getTopicType();
+    const configuredType = this.settingsService.getNavSettings(topicChunks).getTopicType();
     const lastChunk = topicChunks.at(-1);
+    const topicType = SettingDecisions.decideType(configuredType, lastChunk, null);
     let result = "No topic"
-    if (topicType === 'Light' || topicType === 'Window') {
+    if (this.typesUsedForNameing.includes(topicType)) {
       result = topicType;
     } else if (lastChunk !== undefined) {
       result = lastChunk;
-    }
-    return result;
-  }
-
-  /**
-   * Remove postfix strings showing units
-   * @param name current name
-   * @returns new name without postfix
-   */
-  private removeUnitPostfix(name: string): string {
-
-    let result = name;
-    for (const postFix in this.unitPostFixes) {
-      if (name.endsWith(postFix)) {
-        result = name.slice(0, -postFix.length);
-        break;
-      }
     }
     return result;
   }
@@ -174,7 +156,6 @@ export class DisplaynameService {
     if (result.startsWith('pc') && !result.startsWith('pc ')) {
       result = 'PC ' + result.slice(2);
     }
-    result = this.removeUnitPostfix(result);
     result = this.getUnambiguousPrefix(topicChunks, curTopicChunks, result) + result;
     result = this.capitalizeFirstLetters(result);
     return result;

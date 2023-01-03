@@ -11,6 +11,39 @@
 
 export class SettingDecisions {
 
+  static typeIdentifier: { [index:string]:string} = {
+    "window": "Window",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "roller shutter": "Roller",
+    "pressure": "Air Pressure"
+  }
+
+  static unitIdentifier: { [index:string]:string } = {
+    "Temperature": "°C",
+    "Humidity": "%rH",
+    "Air Pressure": "hPa"
+  }
+
+  /**
+   * Derives the type from the topic
+   * @param topicChunk last chunk of the topic
+   * @returns decided type, if the topic chunk contains a specific type
+   */
+  private static typeByTopic(topicChunk: string | null | undefined): string | null {
+    if (!topicChunk) {
+      return null;
+    }
+    let result: string | null = null;
+    for (let name in this.typeIdentifier) {
+      if (topicChunk.includes(name)) {
+        result = this.typeIdentifier[name];
+        break;
+      }
+    }
+    return result;
+  }
+
   /**
    * Checks, if a topic is a switch
    * @param topicType type of the topic
@@ -34,11 +67,14 @@ export class SettingDecisions {
    * @param topicValue current value
    * @returns the topic but "Automatic" is replaced by a concrete type based on the current value
    */
-  static decideType(topicType: string, topicValue: string | number | null): string {
+  static decideType(topicType: string, topicChunk: string | undefined | null, topicValue: string | number | null): string {
     let result = topicType === '' ? 'Information' : topicType;
     if (topicType === 'Automatic') {
+      const typeByTopic = this.typeByTopic(topicChunk);
       if (this.isSwitch(topicType, topicValue)) {
         result = 'Switch'
+      } else if (typeByTopic !== null) {
+        result = typeByTopic;
       } else {
         result = 'Information'
       }
@@ -73,4 +109,14 @@ export class SettingDecisions {
     return lowercaseValue !== 'off' && lowercaseValue !== '0' && lowercaseValue !== 'false';
   }
 
- }
+  /**
+   * Gets the unit for a topic type
+   * @param topicType type of the current topic
+   * @returns unit for the type
+   */
+  static getUnit(topicType: string) : string {
+    const unit = this.unitIdentifier[topicType];
+    return unit ? unit : "";
+  }
+
+}

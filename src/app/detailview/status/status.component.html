@@ -1,7 +1,7 @@
 <div class="status-box">
     <div class="status-headline">{{beautifiedTopicName}}</div>
-    <div class="status-truename">{{topicName}}</div>
-    <div class="status-value" *ngIf="topicType === 'Information'">{{topicValue}}</div>
+    <div class="status-truename">{{topicName}} (Type: {{topicType}})</div>
+    <div class="status-value" *ngIf="topicType !== 'Parameter' && !isSwitch()">{{topicValue}} {{topicUnit}}</div>
     <div class="status-box" *ngIf="topicType === 'Parameter'">
         <mat-form-field>
             <mat-label>Value</mat-label>
