@@ -11,7 +11,7 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { IMessage, IMessages } from 'src/app/data/message';
+import { IMessages } from 'src/app/data/message';
 import { SettingsService } from 'src/app/settings/settings.service';
 import { Subscription } from 'rxjs'
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
@@ -22,6 +22,14 @@ export type IValueChangeInfo = {
   value: string
 }
 
+type topicInfo_t = {
+  topic: string,
+  value: string,
+  topicType: string,
+  isSwitch: boolean,
+  isSwitchOn: boolean
+}
+
 @Component({
   selector: 'app-topics',
   templateUrl: './topics.component.html',
@@ -29,14 +37,13 @@ export type IValueChangeInfo = {
 })
 export class TopicsComponent {
 
-  @Input() messages: IMessages | null = null;
   @Input() topicChunks: string[] = [];
   @Input() updatingTopics: { [index:string]: boolean } = {};
 
   @Output() valueChangeEvent = new EventEmitter<IValueChangeInfo>();
 
   subscription: Subscription | null = null;
-
+  topicInfos: topicInfo_t[] = []
 
   constructor(
     private settingsService: SettingsService,
@@ -46,6 +53,35 @@ export class TopicsComponent {
 
 
   ngOnChanges() {
+  }
+
+  sortTopicInfos(topicInfos: topicInfo_t[]): topicInfo_t[] {
+    topicInfos.sort((a: topicInfo_t, b: topicInfo_t) => { 
+      if (a.topicType < b.topicType) {
+        return -1;
+      } else if (a.topicType > b.topicType) {
+        return  1;
+      } else {
+        return 0;
+      }
+    })
+    return topicInfos;
+  }
+
+  @Input() 
+  set messages(messages: IMessages) {
+    if (messages !== null) {
+      const newTopicInfos: topicInfo_t[] = []
+      for (const message of messages) {
+        const topic = message.topic;
+        const value = message.value ? String(message.value) : "";
+        const topicType = this.getTopicType(topic, value);
+        const isSwitch = this.isSwitch(topicType, value);
+        const isSwitchOn = this.isSwitchOn(value);
+        newTopicInfos.push({ topic, value, topicType, isSwitch, isSwitchOn });
+      }
+      this.topicInfos = this.sortTopicInfos(newTopicInfos);
+    }
   }
 
   /**
@@ -77,19 +113,22 @@ export class TopicsComponent {
   }
 
   /**
-   * Returns a message by its topic
-   * @param topic of the message
-   * @returns message 
+   * Checks, if a topic is a switch
+   * @param topicType type of the topic
+   * @param topicValue value of the topic
+   * @returns true, if the topic is a swith
    */
-  private getMessageByTopic(topic: string): IMessage | null {
-    if (this.messages !== null) {
-      for (const message of this.messages) {
-        if (message.topic === topic) {
-          return message;
-        }
-      }
-    }
-    return null;
+  isSwitch(topicType: string, topicValue: string): boolean {
+    return SettingDecisions.isSwitch(topicType, topicValue);
+  }
+
+  /**
+   * Checks, if a switch is on
+   * @param topicValue value of the topic
+   * @returns true, if the switch is on
+   */
+  isSwitchOn(topicValue: string): boolean {
+    return SettingDecisions.isSwitchOn(topicValue)
   }
 
   trimString(str: string | number, maxLen: number = 45): string {
@@ -98,48 +137,6 @@ export class TopicsComponent {
       result = result.slice(0, maxLen - 4) + '...';
     }
     return result;
-  }
-
-  /**
-   * Gets a value of a topic
-   * @param topic topic to get the value
-   * @returns value of the topic
-   */
-  getValue(topic: string): string | number {
-    const message = this.getMessageByTopic(topic);
-    return message ? message.value : "";
-  }
-
-  /**
-   * Sets the value of a message identified by its topic
-   * @param topic topic of the message
-   * @param value new value of the message
-   */
-  setValue(topic: string, value: string) {
-    const message = this.getMessageByTopic(topic);
-    if (message) {
-      message.value = value;
-    }
-  }
-
-  /**
-   * Checks, if a topic is a switch
-   * @param topic topic to check
-   * @returns true, if the topic is a swith
-   */
-  isSwitch(topic: string): boolean {
-    const settings = this.settingsService.getNavSettings(topic.split('/'));
-    const topicType = settings.getTopicType();
-    return SettingDecisions.isSwitch(topicType, this.getValue(topic));
-  }
-
-  /**
-   * Checks, if a switch is on
-   * @param topic topic to identify the switch
-   * @returns true, if the switch is on
-   */
-  isSwitchOn(topic: string): boolean {
-    return SettingDecisions.isSwitchOn(this.getValue(topic))
   }
 
   /**
@@ -171,16 +168,36 @@ export class TopicsComponent {
   }
 
   /**
-   * Gets the unit string of the topic value
-   * @returns unit string
+   * Gets the type of a topic
+   * @param topic topic of the element
+   * @returns topic type 
    */
-  getUnit(topic: string): string {
+  getTopicType(topic: string, topicValue: string): string {
     const topicChunks = topic.split('/');
     const lastChunk = topicChunks.at(-1);
     const navSettings = this.settingsService.getNavSettings(topic.split('/'));
-    const topicType = SettingDecisions.decideType(navSettings.getTopicType(), lastChunk, null);
+    const topicType = SettingDecisions.decideType(navSettings.getTopicType(), lastChunk, topicValue);
+    return topicType;
+  }
+
+  /**
+   * Gets the unit string of the topic value
+   * @param topic topic of the element
+   * @returns unit string
+   */
+  getUnit(topicType: string): string {
     const topicUnit = SettingDecisions.getUnit(topicType);
     return topicUnit;
+  }
+
+  /**
+   * Gets the picture of a topic
+   * @param topic topic of the element
+   * @returns name of the picture
+   */
+  getPicture(topicType: string): string | null {
+    const picture = SettingDecisions.getPicture(topicType);
+    return picture;
   }
 
 

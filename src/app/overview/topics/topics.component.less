@@ -8,7 +8,7 @@
 .card-box > button {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex: 1;
     min-height: 70px;
     border-radius: 10px;
@@ -22,6 +22,12 @@
     color: #495057;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.card-box > button > img {
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
 }
 
 .card-box :hover {

@@ -16,13 +16,29 @@ export class SettingDecisions {
     "temperature": "Temperature",
     "humidity": "Humidity",
     "roller shutter": "Roller",
-    "pressure": "Air Pressure"
+    "pressure": "Air Pressure",
+    "camera": "Camera",
+    "light on time": "Light"
   }
+
+  static switchingTypes: string[] = [
+    "Roller", "Camera", "Light", "Switch"
+  ]
 
   static unitIdentifier: { [index:string]:string } = {
     "Temperature": "°C",
     "Humidity": "%rH",
     "Air Pressure": "hPa"
+  }
+
+  static pictures: { [index:string]:string } = {
+    "Light": "lightbulb_FILL0_wght400_GRAD0_opsz48.png",
+    "Temperature": "device_thermostat_FILL0_wght400_GRAD0_opsz48.png",
+    "Humidity": "humidity_percentage_FILL0_wght400_GRAD0_opsz48.png",
+    "Camera": "camera_indoor_FILL0_wght400_GRAD0_opsz48.png",
+    "Charge": "charger_FILL0_wght400_GRAD0_opsz48.png",
+    "TV": "tv_gen_FILL0_wght400_GRAD0_opsz48.png",
+    "Ventilation": "airware_FILL0_wght400_GRAD0_opsz48.png"
   }
 
   /**
@@ -52,7 +68,7 @@ export class SettingDecisions {
    */
   static isSwitch(topicType: string, topicValue: string | number | null): boolean {
     let result = false;
-    if (topicType === 'Switch' || topicType === 'Light') {
+    if (this.switchingTypes.includes(topicType)) {
       result = true;
     } else if (topicType === 'Automatic' && topicValue) {
       const lowercaseValue = String(topicValue).toLowerCase();
@@ -71,10 +87,10 @@ export class SettingDecisions {
     let result = topicType === '' ? 'Information' : topicType;
     if (topicType === 'Automatic') {
       const typeByTopic = this.typeByTopic(topicChunk);
-      if (this.isSwitch(topicType, topicValue)) {
-        result = 'Switch'
-      } else if (typeByTopic !== null) {
+      if (typeByTopic !== null) {
         result = typeByTopic;
+      } else if (this.isSwitch(topicType, topicValue)) {
+        result = 'Switch'
       } else {
         result = 'Information'
       }
@@ -117,6 +133,16 @@ export class SettingDecisions {
   static getUnit(topicType: string) : string {
     const unit = this.unitIdentifier[topicType];
     return unit ? unit : "";
+  }
+
+  /**
+   * Gets the icon-picture for a topic type
+   * @param topicType type of the current topic
+   * @returns name of the picture
+   */
+  static getPicture(topicType: string) : string | null {
+    const picture = this.pictures[topicType];
+    return picture ? picture : null;
   }
 
 }
