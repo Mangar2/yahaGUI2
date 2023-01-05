@@ -1,6 +1,6 @@
 <div class="card-box">
     <button *ngFor="let topicInfo of topicInfos" (click)="viewDetails(topicInfo.topic)">
-        <img *ngIf="getPicture(topicInfo.topicType) !== null" src="assets/{{getPicture(topicInfo.topicType)}}">
+        <img *ngIf="getPicture(topicInfo) !== null" src="assets/{{getPicture(topicInfo)}}">
         <div class="text-info-box">
             <span class="card-topic">{{getName(topicInfo.topic)}}</span>
             <span class="card-value" *ngIf="!topicInfo.isSwitch">

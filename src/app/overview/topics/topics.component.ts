@@ -195,8 +195,8 @@ export class TopicsComponent {
    * @param topic topic of the element
    * @returns name of the picture
    */
-  getPicture(topicType: string): string | null {
-    const picture = SettingDecisions.getPicture(topicType);
+  getPicture(topicInfo: topicInfo_t): string | null {
+    const picture = SettingDecisions.getPicture(topicInfo.topic, topicInfo.topicType);
     return picture;
   }
 

@@ -17,7 +17,6 @@ export class SettingDecisions {
     "humidity": "Humidity",
     "roller shutter": "Roller",
     "pressure": "Air Pressure",
-    "camera": "Camera",
     "light on time": "Light"
   }
 
@@ -32,13 +31,15 @@ export class SettingDecisions {
   }
 
   static pictures: { [index:string]:string } = {
-    "Light": "lightbulb_FILL0_wght400_GRAD0_opsz48.png",
-    "Temperature": "device_thermostat_FILL0_wght400_GRAD0_opsz48.png",
-    "Humidity": "humidity_percentage_FILL0_wght400_GRAD0_opsz48.png",
     "Camera": "camera_indoor_FILL0_wght400_GRAD0_opsz48.png",
     "Charge": "charger_FILL0_wght400_GRAD0_opsz48.png",
+    "Humidity": "humidity_percentage_FILL0_wght400_GRAD0_opsz48.png",
+    "Light": "lightbulb_FILL0_wght400_GRAD0_opsz48.png",
+    "Pressure": "air_pressure.png",
+    "Temperature": "device_thermostat_FILL0_wght400_GRAD0_opsz48.png",
     "TV": "tv_gen_FILL0_wght400_GRAD0_opsz48.png",
-    "Ventilation": "airware_FILL0_wght400_GRAD0_opsz48.png"
+    "Ventilation": "ventilation.png",
+    "Window": "window.png",
   }
 
   /**
@@ -137,12 +138,19 @@ export class SettingDecisions {
 
   /**
    * Gets the icon-picture for a topic type
+   * @param topic current topic used to select the picture
    * @param topicType type of the current topic
    * @returns name of the picture
    */
-  static getPicture(topicType: string) : string | null {
-    const picture = this.pictures[topicType];
-    return picture ? picture : null;
+  static getPicture(topic: string, topicType: string) : string | null {
+    let result = null;
+    for (const pictureName in this.pictures) {
+      if (topic.includes(pictureName.toLowerCase())) {
+        result = this.pictures[pictureName];
+        break;
+      }
+    }
+    return result;
   }
 
 }
