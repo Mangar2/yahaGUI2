@@ -5,10 +5,13 @@
     <div class="status-box" *ngIf="topicType === 'Parameter'">
         <mat-form-field>
             <mat-label>Value</mat-label>
-            <input matInput #topicValueInput value="{{topicValue}}">
+            <input matInput [(ngModel)]="topicValue" *ngIf="valueType !== 'Enumeration'">
+            <mat-select [(value)]="topicValue"  *ngIf="navSettings !== null && valueType === 'Enumeration'">
+                <mat-option *ngFor="let entry of navSettings.getEnumList()" value="{{entry}}">{{entry}}</mat-option>
+            </mat-select>
         </mat-form-field>
 
-        <button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange(topicValueInput.value)">Update
+        <button mat-button *ngIf="topicType === 'Parameter'" (click)="onTopicValueChange(topicValue)">Update
         </button>
     </div>
     <div *ngIf="isSwitch()">

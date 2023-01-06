@@ -1,20 +1,44 @@
 <div class="settings-box">
-    <mat-form-field appearance="fill">
-        <mat-label>Select topic type</mat-label>
-        <mat-select [(value)]="settingOptions.topicType" (selectionChange)="onSelectTopic()">
-            <mat-option *ngFor="let type of settingOptions.topicTypes" value="{{type}}">{{type}}</mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field *ngIf="settingOptions.topicType === 'Parameter'" topic appearance="fill">
-        <mat-label>Select value type</mat-label>
-        <mat-select [(value)]="settingOptions.valueType" (selectionChange)="onSelectValueType()">
-            <mat-option *ngFor="let type of settingOptions.valueTypes" value="{{type}}">{{type}}</mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Select topic rank</mat-label>
-        <mat-select [(value)]="settingOptions.topicRank" (selectionChange)="onSelectRank()">
-            <mat-option *ngFor="let rank of settingOptions.topicRanks" value="{{rank}}">{{rank}}</mat-option>
-        </mat-select>
-    </mat-form-field>
+    <div>
+        <mat-form-field appearance="fill">
+            <mat-label>Select topic type</mat-label>
+            <mat-select [(value)]="settingOptions.topicType" (selectionChange)="onSelectTopic()">
+                <mat-option *ngFor="let type of settingOptions.topicTypes" value="{{type}}">{{type}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Select topic rank</mat-label>
+            <mat-select [(value)]="settingOptions.topicRank" (selectionChange)="onSelectRank()">
+                <mat-option *ngFor="let rank of settingOptions.topicRanks" value="{{rank}}">{{rank}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Select icon</mat-label>
+            <mat-select [(value)]="settingOptions.topicIcon" (selectionChange)="onSelectIcon()">
+                <mat-option *ngFor="let icon of settingOptions.topicIcons" value="{{icon}}">{{icon}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div *ngIf="settingOptions.topicType === 'Parameter'">
+        <mat-form-field  topic appearance="fill">
+            <mat-label>Select value type</mat-label>
+            <mat-select [(value)]="settingOptions.valueType" (selectionChange)="onSelectValueType()">
+                <mat-option *ngFor="let type of settingOptions.valueTypes" value="{{type}}">{{type}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-selection-list *ngIf="settingOptions.valueType === 'Enumeration' && settings !== null">
+            <mat-list-option *ngFor="let entry of settings.getEnumList()">
+                {{entry}}
+            </mat-list-option>
+        </mat-selection-list>
+        <mat-form-field appearance="fill"
+            *ngIf="settingOptions.valueType === 'Enumeration'">
+            <mat-label>Add to enumeration</mat-label>
+            <input matInput #enumValue>
+            <button *ngIf="enumValue.value" matSuffix mat-icon-button
+                (click)="addToEnum(enumValue.value); enumValue.value=''">
+                <mat-icon>add</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
 </div>

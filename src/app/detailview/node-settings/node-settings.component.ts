@@ -26,6 +26,7 @@ export class NodeSettingsComponent {
   settings: INavSettings | null = null;
 
   settingOptions = this.globalSettings.getSettingOptions()
+  value = "test";
 
   constructor(
     private settingService: SettingsService,
@@ -75,6 +76,25 @@ export class NodeSettingsComponent {
     this.settings?.setTopicRank(this.settingOptions.topicRank);
     this.settingService.writeToLocalStore();
     this.settingChangeEvent.emit();
+  }
+
+  /**
+   * Sets the picture to the setting store
+   */
+  onSelectIcon() {
+    this.settings?.setIconName("base", this.settingOptions.topicIcon);
+    this.settingService.writeToLocalStore();
+    this.settingChangeEvent.emit();
+  }
+
+  addToEnum(value: string): void {
+    if (!this.settings) {
+      return;
+    }
+    const curList = this.settings.getEnumList();
+    curList.push(value);
+    this.settings.setEnumList(curList);
+    this.settingService.writeToLocalStore();
   }
 
 }

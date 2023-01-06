@@ -105,7 +105,6 @@ export class DetailOverviewComponent {
         this.messagesTree.setHttpResult(resp);
         const newNode = this.messagesTree.getNodeByTopicChunks(topicChunks);
         if (!oldTime || newNode?.time !== oldTime) {
-          console.log("new history request");
           this.requestNewHistoryInfo(topicChunks);
         }
       }))

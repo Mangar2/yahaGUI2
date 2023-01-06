@@ -29,6 +29,9 @@ export interface INavSettings {
   setValueType(type: string): void;
   getValueType(): string;
 
+  setEnumList(list: string[]): void;
+  getEnumList():string[];
+
   setTopicRank(type: string): void;
   getTopicRank(): number;
 
@@ -176,6 +179,14 @@ class NavSettings implements INavSettings {
     return result? result : 'Automatic';
   }
 
+  setEnumList(list: string[]): void {
+    this.setParameter("enumList", list.length === 0 ? null: JSON.stringify(list))
+  }
+  getEnumList():string[] {
+    const result = this.getParameter("enumList");
+    return result ? JSON.parse(result) : [];
+  }
+
   setTopicRank(rank: string): void {
     this.setParameter("topicRank", rank === 'Automatic' ? null : rank);
   };
@@ -186,7 +197,7 @@ class NavSettings implements INavSettings {
   }
 
   setIconName(type: string, iconName: string): void {
-    this.setParameter("icon_" + type, type === 'Automatic' ? null : type);
+    this.setParameter("icon_" + type, type === 'Automatic' ? null : iconName);
   };
   getIconName(type: string): string {
     const result = this.getParameter("icon_" + type);

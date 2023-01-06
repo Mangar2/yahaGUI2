@@ -1,10 +1,19 @@
 .settings-box {
-    min-width: 150px;
-    max-width: 300px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    text-overflow: ellipsis;
-    align-items: stretch;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 10px;
+}
+.settings-box > div {
+    display: flex;
+    flex-direction: column;
+}
+.settings-box > div > mat-form-field {
+    width: 200px;
+}
+
+.settings-box > div > mat-selection-list {
+    width: 200px;
 }
 

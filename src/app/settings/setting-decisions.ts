@@ -30,7 +30,7 @@ export class SettingDecisions {
     "Air Pressure": "hPa"
   }
 
-  static pictures: { [index:string]:string } = {
+  static icons: { [index:string]:string } = {
     "Camera": "camera_indoor_FILL0_wght400_GRAD0_opsz48.png",
     "Charge": "charger_FILL0_wght400_GRAD0_opsz48.png",
     "Humidity": "humidity_percentage_FILL0_wght400_GRAD0_opsz48.png",
@@ -144,9 +144,9 @@ export class SettingDecisions {
    */
   static getPicture(topic: string, topicType: string) : string | null {
     let result = null;
-    for (const pictureName in this.pictures) {
+    for (const pictureName in this.icons) {
       if (topic.includes(pictureName.toLowerCase())) {
-        result = this.pictures[pictureName];
+        result = this.icons[pictureName];
         break;
       }
     }

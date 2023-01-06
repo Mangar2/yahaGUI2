@@ -10,6 +10,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { SettingDecisions } from './setting-decisions';
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +30,15 @@ export class GlobalSettingsService {
     valueTypes: ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'],
     topicRank: 'Automatic',
     topicRanks: ['Automatic', 1, 2, 3, 4, 5],
-    topicPicture: 'Automatic'
+    topicIcon: 'Automatic',
+    topicIcons: ['Automatic']
   }
 
-  constructor() { }
+  constructor() { 
+    for (let icon in SettingDecisions.icons) {
+      this.settingOptions.topicIcons.push(icon);
+    }
+  }
 
   getDetailViewRefreshInMilliseconds() {
     return this.settings.detail_View_Refresh_In_Milliseconds;
