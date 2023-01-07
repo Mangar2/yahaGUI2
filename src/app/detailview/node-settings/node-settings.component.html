@@ -20,25 +20,27 @@
         </mat-form-field>
     </div>
     <div *ngIf="settingOptions.topicType === 'Parameter'">
-        <mat-form-field  topic appearance="fill">
+        <mat-form-field topic appearance="fill">
             <mat-label>Select value type</mat-label>
             <mat-select [(value)]="settingOptions.valueType" (selectionChange)="onSelectValueType()">
                 <mat-option *ngFor="let type of settingOptions.valueTypes" value="{{type}}">{{type}}</mat-option>
             </mat-select>
         </mat-form-field>
-        <mat-selection-list *ngIf="settingOptions.valueType === 'Enumeration' && settings !== null">
-            <mat-list-option *ngFor="let entry of settings.getEnumList()">
-                {{entry}}
-            </mat-list-option>
-        </mat-selection-list>
-        <mat-form-field appearance="fill"
-            *ngIf="settingOptions.valueType === 'Enumeration'">
-            <mat-label>Add to enumeration</mat-label>
-            <input matInput #enumValue>
+        <mat-list *ngIf="settingOptions.valueType === 'Enumeration' && settings !== null" class="enum-list">
+            <mat-list-item *ngFor="let entry of settings.getEnumList()">
+                <button matSuffix mat-icon-button (click)="removeFromEnum(entry)">
+                    <mat-icon class="mat-24">delete</mat-icon>
+                </button>
+                <span mat-line>{{entry}}</span>
+            </mat-list-item>
+        </mat-list>
+        <mat-form-field appearance="fill" *ngIf="settingOptions.valueType === 'Enumeration'">
             <button *ngIf="enumValue.value" matSuffix mat-icon-button
                 (click)="addToEnum(enumValue.value); enumValue.value=''">
                 <mat-icon>add</mat-icon>
             </button>
+            <mat-label>Add to enumeration</mat-label>
+            <input matInput #enumValue>
         </mat-form-field>
     </div>
 </div>

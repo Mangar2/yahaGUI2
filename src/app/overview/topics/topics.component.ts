@@ -12,7 +12,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { IMessages } from 'src/app/data/message';
-import { SettingsService } from 'src/app/settings/settings.service';
+import { INavSettings, SettingsService } from 'src/app/settings/settings.service';
 import { Subscription } from 'rxjs'
 import { SettingDecisions } from 'src/app/settings/setting-decisions';
 import { DisplaynameService } from 'src/app/settings/displayname.service';
@@ -26,8 +26,11 @@ type topicInfo_t = {
   topic: string,
   value: string,
   topicType: string,
+  valueType: string,
   isSwitch: boolean,
-  isSwitchOn: boolean
+  isSwitchOn: boolean,
+  icon: string | null,
+  enumeration: string[]
 }
 
 @Component({
@@ -74,11 +77,16 @@ export class TopicsComponent {
       const newTopicInfos: topicInfo_t[] = []
       for (const message of messages) {
         const topic = message.topic;
+        const navSettings = this.getNavSettings(topic);
         const value = message.value ? String(message.value) : "";
         const topicType = this.getTopicType(topic, value);
-        const isSwitch = this.isSwitch(topicType, value);
-        const isSwitchOn = this.isSwitchOn(value);
-        newTopicInfos.push({ topic, value, topicType, isSwitch, isSwitchOn });
+        const valueType = SettingDecisions.decideValueType(navSettings.getValueType(), value);
+        const enumList = navSettings.getEnumList();
+        const isSwitch = this.isSwitch(value, topicType, valueType);
+        const isSwitchOn = this.isSwitchOn(value, topicType, valueType, enumList);
+        const icon = this.getIcon(navSettings.getIconName(), topic, value);
+        const enumeration = navSettings.getEnumList();
+        newTopicInfos.push({ topic, value, topicType, valueType, isSwitch, isSwitchOn, icon, enumeration });
       }
       this.topicInfos = this.sortTopicInfos(newTopicInfos);
     }
@@ -118,8 +126,9 @@ export class TopicsComponent {
    * @param topicValue value of the topic
    * @returns true, if the topic is a swith
    */
-  isSwitch(topicType: string, topicValue: string): boolean {
-    return SettingDecisions.isSwitch(topicType, topicValue);
+  isSwitch(topicValue: string, topicType: string, valueType: string): boolean {
+    const isSwitch = SettingDecisions.isSwitch(topicValue, topicType);
+    return isSwitch || valueType.toLowerCase() === 'enumeration';
   }
 
   /**
@@ -127,8 +136,8 @@ export class TopicsComponent {
    * @param topicValue value of the topic
    * @returns true, if the switch is on
    */
-  isSwitchOn(topicValue: string): boolean {
-    return SettingDecisions.isSwitchOn(topicValue)
+  isSwitchOn(topicValue: string, topicType: string, valueType: string, enumList: string[] ): boolean {
+    return SettingDecisions.isSwitchOn(topicValue, topicType, valueType, enumList)
   }
 
   trimString(str: string | number, maxLen: number = 45): string {
@@ -152,8 +161,9 @@ export class TopicsComponent {
    * @param topic of the element
    * @param event change event
    */
-  onChange(topic: string, event: any): void {
-    const newValue = event.checked ? 'on' : 'off';
+  onChange(topicInfo: topicInfo_t, event: any): void {
+    const { topic, topicType, valueType, enumeration } = topicInfo;
+    const newValue = SettingDecisions.newSwitchValue(event.checked, topicType, valueType, enumeration);
     event.source.checked = !event.checked;
     this.valueChangeEvent.emit({ topic, value: newValue });
   }
@@ -168,6 +178,17 @@ export class TopicsComponent {
   }
 
   /**
+   * Gets the navigation settings of a topic
+   * @param topic topic of the element
+   * @returns navigation settings
+   */
+  getNavSettings(topic: string): INavSettings {
+    const topicChunks = topic.split('/');
+    const navSettings = this.settingsService.getNavSettings(topicChunks);
+    return navSettings;
+  }
+
+  /**
    * Gets the type of a topic
    * @param topic topic of the element
    * @returns topic type 
@@ -175,7 +196,7 @@ export class TopicsComponent {
   getTopicType(topic: string, topicValue: string): string {
     const topicChunks = topic.split('/');
     const lastChunk = topicChunks.at(-1);
-    const navSettings = this.settingsService.getNavSettings(topic.split('/'));
+    const navSettings = this.getNavSettings(topic);
     const topicType = SettingDecisions.decideType(navSettings.getTopicType(), lastChunk, topicValue);
     return topicType;
   }
@@ -195,8 +216,8 @@ export class TopicsComponent {
    * @param topic topic of the element
    * @returns name of the picture
    */
-  getPicture(topicInfo: topicInfo_t): string | null {
-    const picture = SettingDecisions.getPicture(topicInfo.topic, topicInfo.topicType);
+  getIcon(iconName: string, topic: string, topicValue: string): string | null {
+    const picture = SettingDecisions.getIcon(iconName, topic, topicValue);
     return picture;
   }
 

@@ -35,8 +35,8 @@ export interface INavSettings {
   setTopicRank(type: string): void;
   getTopicRank(): number;
 
-  setIconName(type: string, iconName: string): void;
-  getIconName(type: string): string;
+  setIconName(iconName: string): void;
+  getIconName(): string;
 
   setHistoryType(type: string): void;
   getHistoryType(): string;
@@ -196,11 +196,11 @@ class NavSettings implements INavSettings {
     return result;
   }
 
-  setIconName(type: string, iconName: string): void {
-    this.setParameter("icon_" + type, type === 'Automatic' ? null : iconName);
+  setIconName(iconName: string): void {
+    this.setParameter("icon", iconName === 'Automatic' ? null : iconName);
   };
-  getIconName(type: string): string {
-    const result = this.getParameter("icon_" + type);
+  getIconName(): string {
+    const result = this.getParameter("icon");
     return result? result : 'Automatic';
   }
 

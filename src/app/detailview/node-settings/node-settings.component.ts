@@ -82,12 +82,15 @@ export class NodeSettingsComponent {
    * Sets the picture to the setting store
    */
   onSelectIcon() {
-    this.settings?.setIconName("base", this.settingOptions.topicIcon);
+    this.settings?.setIconName(this.settingOptions.topicIcon);
     this.settingService.writeToLocalStore();
-    this.settingChangeEvent.emit();
   }
 
-  addToEnum(value: string): void {
+  /**
+   * Adds an element to the enumeration list of the current topic
+   * @param value value to add to enumeration list
+   */
+  addToEnum(value: string) {
     if (!this.settings) {
       return;
     }
@@ -95,6 +98,23 @@ export class NodeSettingsComponent {
     curList.push(value);
     this.settings.setEnumList(curList);
     this.settingService.writeToLocalStore();
+  }
+
+  /**
+   * Removes an element from the enumeration list of the current topic
+   * @param value value to remove from enumeration list
+   */
+  removeFromEnum(value: string) {
+    if (!this.settings) {
+      return;
+    }
+    const curList = this.settings.getEnumList();
+    const index = curList.indexOf(value);
+    if (index >= 0) {
+      curList.splice(index, 1);
+      this.settings.setEnumList(curList);
+      this.settingService.writeToLocalStore();
+    }
   }
 
 }

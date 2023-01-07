@@ -96,7 +96,10 @@ export class StatusComponent {
   }
 
   public isSwitchOn(): boolean {
-    return SettingDecisions.isSwitchOn(this.topicValue);
+    if (this.navSettings === null) {
+      return false;
+    }
+    return SettingDecisions.isSwitchOn(this.topicValue, this.topicType, this.valueType, this.navSettings.getEnumList());
   }
 
   /**
@@ -114,7 +117,7 @@ export class StatusComponent {
    * @returns true, if the item is a switch
    */
   isSwitch() {
-    return SettingDecisions.isSwitch(this.topicType, this.topicValue);
+    return SettingDecisions.isSwitch(this.topicValue, this.topicType);
   }
 
   /**
