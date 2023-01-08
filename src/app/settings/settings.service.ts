@@ -30,7 +30,7 @@ export interface INavSettings {
   getValueType(): string;
 
   setEnumList(list: string[]): void;
-  getEnumList():string[];
+  getEnumList(): string[];
 
   setTopicRank(type: string): void;
   getTopicRank(): number;
@@ -48,7 +48,7 @@ export interface INavSettings {
 
 }
 
-type parameter_t = { [index: string]: string}
+type parameter_t = { [index: string]: string }
 type nodeConfig_t = { disabled?: string[], parameter?: parameter_t }
 
 /**
@@ -137,7 +137,7 @@ class NavSettings implements INavSettings {
    * @param name name of the parameter
    * @param value value of the parameter
    */
-  private setParameter(name:string, value:string | null): void {
+  private setParameter(name: string, value: string | null): void {
     if (name) {
       if (value) {
         this.parameter[name] = value;
@@ -160,15 +160,15 @@ class NavSettings implements INavSettings {
         result = null;
       }
     }
-    return result;    
+    return result;
   }
-  
+
   setTopicType(type: string): void {
     this.setParameter("topicType", type === 'Automatic' ? null : type);
   };
   getTopicType(): string {
     const result = this.getParameter("topicType");
-    return result? result : 'Automatic';
+    return result ? result : 'Automatic';
   }
 
   setValueType(type: string): void {
@@ -176,13 +176,13 @@ class NavSettings implements INavSettings {
   };
   getValueType(): string {
     const result = this.getParameter("valueType");
-    return result? result : 'Automatic';
+    return result ? result : 'Automatic';
   }
 
   setEnumList(list: string[]): void {
-    this.setParameter("enumList", list.length === 0 ? null: JSON.stringify(list))
+    this.setParameter("enumList", list.length === 0 ? null : JSON.stringify(list))
   }
-  getEnumList():string[] {
+  getEnumList(): string[] {
     const result = this.getParameter("enumList");
     return result ? JSON.parse(result) : [];
   }
@@ -201,7 +201,7 @@ class NavSettings implements INavSettings {
   };
   getIconName(): string {
     const result = this.getParameter("icon");
-    return result? result : 'Automatic';
+    return result ? result : 'Automatic';
   }
 
   setHistoryType(history: string): void {
@@ -209,7 +209,7 @@ class NavSettings implements INavSettings {
   };
   getHistoryType(): string {
     const result = this.getParameter("history");
-    return result? result : 'Automatic';
+    return result ? result : 'Automatic';
   }
 
   setChartType(chartType: string): void {
@@ -217,26 +217,50 @@ class NavSettings implements INavSettings {
   };
   getChartType(): string {
     const result = this.getParameter("chart");
-    return result? result : 'Automatic';
+    return result ? result : 'Automatic';
   }
-  
+
   copy(): INavSettings {
     return new NavSettings(this.disabled, this.parameter);
   }
 
 }
 
+export type navSettings_t = { [index: string]: NavSettings };
+
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
 
-  navSettingsStore: { [index: string]: NavSettings } = {}
+  navSettingsStore: navSettings_t = {}
   storeName = "yaha_configuration";
 
   constructor() {
     this.getFromLocalStore();
-   }
+  }
+
+  /**
+   * Gets all settings
+   * @returns returns the complete settings tree
+   */
+  public getAllSettings(): navSettings_t {
+    return this.navSettingsStore;
+  }
+
+  /**
+   * Overwrites all current settings with new settings
+   * @param settings new set of settings
+   */
+  public setAllSettings(settings: navSettings_t) {
+    this.navSettingsStore = {}
+    for (const key in settings) {
+      const value = settings[key];
+      const navSettings = new NavSettings(value.disabled, value.parameter);
+      this.setNavSettings(key, navSettings);
+    }
+    this.writeToLocalStore();
+  }
 
   /**
    * Creates a topic string from topic chunks
@@ -290,14 +314,14 @@ export class SettingsService {
     }
   }
 
-  
+
 
   /**
    * Writes navigation settings to the local store
    */
   public writeToLocalStore() {
     if (this.navSettingsStore) {
-      const dataToStore: { [index:string]: nodeConfig_t} = {}
+      const dataToStore: { [index: string]: nodeConfig_t } = {}
       for (const topic in this.navSettingsStore) {
         const value: NavSettings = this.navSettingsStore[topic];
         const nodeConfig: nodeConfig_t = {}

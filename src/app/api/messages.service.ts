@@ -74,4 +74,23 @@ export class MessagesService {
         return this.httpClient.post<PublishResult>(this.host + "angular/api/publish.php", data, { observe: 'response' });
     }
 
+    /**
+     * Stores configuration
+     * @param topic path to the configuration
+     * @param payload configuration to store
+     * @returns observable
+     */
+    storeConfig(topic: string, payload: any): Observable<HttpResponse<string>> {
+        return this.httpClient.post<string>(environment.configHost + topic, payload, { observe: 'response' });
+    }
+
+    /**
+     * Stores configuration
+     * @param topic path to the configuration
+     * @returns observable
+     */
+    readConfig(topic: string): Observable<HttpResponse<any>> {
+        return this.httpClient.get<any>(environment.configHost + topic, { observe: 'response' });
+    }
+
 }
