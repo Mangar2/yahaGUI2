@@ -12,6 +12,8 @@
 import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,8 +21,8 @@ import { AppComponent } from './app.component';
 import { NavModule } from './nav/nav.module';
 import { DetailviewModule } from './detailview/detailview.module';
 import { OverviewModule } from './overview/overview.module';
-import { HttpClientModule } from '@angular/common/http';
-import { ServiceWorkerModule } from '@angular/service-worker';
+import { SettingsModule } from './settings/settings.module';
+
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     HttpClientModule,
     DetailviewModule,
     OverviewModule,
+    SettingsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

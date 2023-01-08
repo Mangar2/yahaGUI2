@@ -2,14 +2,13 @@
     font-variation-settings: "FILL" 0, "wght" 300, "GRAD" -25, "opsz" 48;
 }
 
-.nav-box {
+header {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
-    flex-grow: 100%;
-    overflow: hidden;
+    flex-wrap: nowrap;
+    width: 100%;
     height: 40px;
     border-radius: 5px;
     background-color: rgb(238, 238, 238);
@@ -17,7 +16,15 @@
     margin-bottom: 10px;
 }
 
-.nav-box > div {
+.breadcrumb {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.breadcrumb-item {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -26,7 +33,7 @@
     flex-grow: 0;
 }
 
-.nav-box > div > button {
+.breadcrumb-item > button {
     height: 30px;
     border-radius: 5px;
     border: none;
@@ -40,7 +47,7 @@
     max-width: 200px;
 }
 
-.nav-box > div > span {
+.breadcrumb-item > span {
     height: 30px;
     line-height: 32px;
     font-weight: 700;

@@ -41,7 +41,7 @@ export class LineChartComponent {
     if (!topicNode.history) {
       return;
     }
-    if (topicNode.time && topicNode.value) {
+    if (topicNode.time && topicNode.value !== undefined) {
       const x = (new Date(topicNode.time)).getTime();
       const y = Number(topicNode.value);
       this.data.push({ x, y })
@@ -49,7 +49,7 @@ export class LineChartComponent {
     const now = Date.now();
     const msInDay = 24 * 3600 * 1000;
     for (const point of topicNode.history) {
-      if (point.time && point.value) {
+      if (point.time && point.value !== undefined) {
         const x = (new Date(point.time)).getTime();
         const y = Number(point.value);
         if (now - x < msInDay * 5) {
@@ -90,7 +90,7 @@ export class LineChartComponent {
           x: {
             ticks: {
               callback: function(value) { 
-                  return new Date(value).toLocaleDateString('de-DE'); 
+                  return new Date(value).toLocaleString('de-DE', {month: "numeric", day:"numeric"}); 
               },
           },
           }

@@ -1,11 +1,16 @@
-<header class="nav-box">
-    <button (click)="onClick(0)">
-        <mat-icon class="font-style" aria-hidden="false" aria-label="Home" fontIcon="home"></mat-icon>
-    </button>
-    <div *ngFor="let chunk of topicChunks; let i = index ">
-        <span>></span>
-        <button (click)="onClick(i + 1)">
-            {{chunk}}
+<header>
+    <div class="breadcrumb">
+        <button mat-icon-button (click)="onClick(0)">
+            <img src="assets/home_FILL0_wght400_GRAD0_opsz48.png">
         </button>
+        <div *ngFor="let chunk of topicChunks; let i = index " class="breadcrumb-item">
+            <span>></span>
+            <button (click)="onClick(i + 1)">
+                {{chunk}}
+            </button>
+        </div>
     </div>
+    <button mat-icon-button (click)="onMenu()">
+        <img src="assets/menu_FILL0_wght400_GRAD0_opsz48.png">
+    </button>
 </header>

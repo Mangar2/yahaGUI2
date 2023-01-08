@@ -25,7 +25,7 @@ export class GlobalSettingsService {
 
   settingOptions = {
     topicType: 'Automatic',
-    topicTypes: ['Automatic', 'Information', 'Switch', 'Light', 'Window', 'Parameter'],
+    topicTypes: ['Automatic', 'Information', 'Switch', 'Light', 'Roller', 'Window', 'Parameter'],
     valueType: 'Automatic',
     valueTypes: ['Automatic', 'Integer', 'Number', 'Enumeration', 'String'],
     topicRank: 'Automatic',

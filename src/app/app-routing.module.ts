@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DetailOverviewComponent } from './detailview/detail-overview/detail-overview.component';
 import { OverviewScreenComponent } from './overview/overview-screen/overview-screen.component';
+import { SettingsControllerComponent } from './settings/settings-controller/settings-controller.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'yahagui/detailview',
     component: DetailOverviewComponent
+  },
+  {
+    path: 'yahagui/settings',
+    component: SettingsControllerComponent
   },
   {
     path: '',

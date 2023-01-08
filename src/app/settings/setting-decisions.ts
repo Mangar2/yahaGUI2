@@ -18,12 +18,11 @@ export class SettingDecisions {
     "temperature": "Temperature",
     "humidity": "Humidity",
     "roller shutter": "Roller",
-    "pressure": "Air Pressure",
-    "light on time": "Light"
+    "pressure": "Air Pressure"
   }
 
   static switchingTypes: string[] = [
-    "Roller", "Camera", "Light", "Switch"
+    "Roller", "Light", "Switch"
   ]
 
   static unitIdentifier: { [index:string]:string } = {
@@ -46,7 +45,10 @@ export class SettingDecisions {
     "Multimedia": "multimedia.png",
     "Presence": "home_pin_FILL0_wght400_GRAD0_opsz48.png",
     "Print": "print_FILL0_wght400_GRAD0_opsz48.png",
-    "PC": "computer_FILL0_wght400_GRAD0_opsz48.png"
+    "PC": "computer_FILL0_wght400_GRAD0_opsz48.png",
+    "Dishwasher": "dishwasher_gen_FILL0_wght400_GRAD0_opsz48.png",
+    "Fridge": "kitchen_FILL0_wght400_GRAD0_opsz48.png"
+
   }
 
   /**
@@ -132,6 +134,7 @@ export class SettingDecisions {
     let result: boolean = false;
     const lowercaseValue = String(value).toLowerCase();
     switch (topicType) {
+      case 'Light': result = lowercaseValue !== 'off' && lowercaseValue !== '0' && lowercaseValue !== 'false'; break;
       case 'Switch': result = lowercaseValue !== 'off' && lowercaseValue !== '0' && lowercaseValue !== 'false'; break;
       case 'Roller': result = lowercaseValue !== 'down' && lowercaseValue !== '0'; break;
       case 'Parameter': {
@@ -199,6 +202,7 @@ export class SettingDecisions {
     switch (topicType) {
       case 'Roller': result = checked ? 'up': 'down'; break;
       case 'Switch': result = checked ? 'on' : 'off'; break;
+      case 'Light': result = checked ? 'on' : 'off'; break;
       case 'Parameter': 
         if (Array.isArray(enumeration) && enumeration.length > 1) {
           const pos = checked ? 0 : 1;
@@ -206,7 +210,6 @@ export class SettingDecisions {
         };
         break;
     }
-    console.log(result);
     return result;
   }
 

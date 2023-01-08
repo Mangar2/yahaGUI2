@@ -78,7 +78,7 @@ export class TopicsComponent {
       for (const message of messages) {
         const topic = message.topic;
         const navSettings = this.getNavSettings(topic);
-        const value = message.value ? String(message.value) : "";
+        const value = message.value !== undefined ? String(message.value) : "";
         const topicType = this.getTopicType(topic, value);
         const valueType = SettingDecisions.decideValueType(navSettings.getValueType(), value);
         const enumList = navSettings.getEnumList();

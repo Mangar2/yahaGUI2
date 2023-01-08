@@ -49,6 +49,8 @@ export class NodeSettingsComponent {
     this.settingOptions.topicType = settings.getTopicType();
     this.settingOptions.valueType = settings.getValueType();
     this.settingOptions.topicRank = String(settings.getTopicRank());
+    this.settingOptions.topicIcon = settings.getIconName();
+    this.settingOptions.valueType = settings.getValueType();
   }
 
   /**

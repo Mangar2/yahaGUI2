@@ -41,4 +41,11 @@ export class HeaderComponent {
     };
     this.router.navigate(['overview'], navigationExtras);
   }
+
+  /**
+   * Opens a setting page
+   */
+  public onMenu() {
+    this.router.navigate(['yahagui', 'settings']);
+  }
 }

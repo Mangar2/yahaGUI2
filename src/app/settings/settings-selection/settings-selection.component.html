@@ -1,0 +1,8 @@
+<mat-form-field appearance="fill">
+    <mat-label>Select device</mat-label>
+    <mat-select [(value)]="configType">
+        <mat-option *ngFor="let type of configTypes" value="{{type}}">{{type}}</mat-option>
+    </mat-select>
+</mat-form-field>
+<button mat-raised-button (click)="onSave(configType)">Save</button>
+<button mat-raised-button color="primary" (click)="onLoad(configType)">Load</button>
