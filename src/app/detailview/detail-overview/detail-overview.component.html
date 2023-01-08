@@ -2,10 +2,14 @@
     <app-node-settings [topicChunks]="topicChunks" (settingChangeEvent)="onSettingChange()">
     </app-node-settings>
     <div>
-        <app-status [topicNode]="topicNode" [navSettings]="navSettings" [isUpdatingTopic]="isUpdatingTopic"
-            (valueChangeEvent)="onValueChange($event)">
-        </app-status>
-        <app-history [topicNode]="topicNode" [navSettings]="navSettings" class="history-box">
+        <div>
+            <app-status [topicNode]="topicNode" [navSettings]="navSettings" [isUpdatingTopic]="isUpdatingTopic"
+                (valueChangeEvent)="onValueChange($event)">
+            </app-status>
+            <app-line-chart  [topicNode]="topicNode" [navSettings]="navSettings">
+            </app-line-chart>
+        </div>
+        <app-history [topicNode]="topicNode" [navSettings]="navSettings">
         </app-history>
     </div>
 </main>

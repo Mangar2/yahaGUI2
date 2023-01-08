@@ -12,7 +12,7 @@
     </mat-nav-list>
     <mat-selection-list *ngIf="enableConfiguration" (selectionChange)="onSelectionChange($event)">
         <mat-list-option *ngFor="let navItem of navItems" class="nav-button" [value]="navItem" [selected]="isSelected(navItem)"
-            [disabled] = "isActive(navItem)"
+            [disabled] = "isRequired(navItem)"
             >
             <span [class.nav-button-text-normal]="!isActive(navItem)" [class.nav-button-text-active]="isActive(navItem)">{{navItem}}</span>
         </mat-list-option>

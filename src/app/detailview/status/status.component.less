@@ -1,16 +1,13 @@
 .status-box {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-width: 100%;
+    align-items: stretch;
 }
 
 .status-value {
     font-weight: 600;
     font-size: 18px;
     color: black;
-    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -29,12 +26,8 @@
     margin-bottom: 15px;
 }
 
-.status-box > mat-form-field {
-    width: 300px;
-}
 
 .status-box > button {
-    width: 300px;
     height: 50px;
     background-color: #007bff;
     font-weight: 600;

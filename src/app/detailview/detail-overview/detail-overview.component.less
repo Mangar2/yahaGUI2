@@ -7,25 +7,46 @@ main {
     gap: 5px;
 }
 
-app-status {
+app-node-settings {
     display: flex;
+    flex-basis: 150px;
+    max-width: 500px;
+    min-width: 150px;
+    flex-grow: 1;
+    flex-shrink: 1;
 }
 
 main > div {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    justify-content: stretch;
+    flex-basis: 600px;
     flex-grow: 4;
-    flex-shrink: 0;
-    flex-basis: 80%;
+    flex-shrink: 1;
     padding-left: 5px;
     padding-right: 5px;
     background-color: rgb(245, 244, 244);
-    max-width: 100%;
 }
 
-.history-box {
+main > div > div {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+}
+
+app-status {
+    display: flex;
+    flex-grow: 1;
+    flex-basis: 250px;
+}
+
+app-line-chart {
+    flex-grow: 5;
+    flex-basis: 300px;
+    height: 250px;
+}
+
+app-history {
     padding-top: 20px;
     display: flex;
     flex-direction: column;

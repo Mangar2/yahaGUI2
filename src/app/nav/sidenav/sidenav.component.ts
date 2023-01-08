@@ -62,9 +62,21 @@ export class SidenavComponent {
     if (!this.navItems || this.navItems.length === 0) {
       return false;
     }
-    const pos = 0;
-    return navItem === this.navItems[pos];
+    return navItem === this.navItems[0];
   }
+
+    /**
+   * Checks, if an item is the active item
+   * @param navItem item to check
+   * @returns true, if the item to check is the active item
+   */
+    isRequired(navItem: string): boolean {
+      if (!this.navItems || this.navItems.length <= 1) {
+        return false;
+      }
+      return navItem === this.navItems[0] || navItem === this.navItems[1];
+    }
+  
 
   /**
    * Checks wether a navigation item is selected

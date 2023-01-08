@@ -45,6 +45,8 @@ export class SettingDecisions {
     "Roller": ["roller_closed.png", "roller_open.png"],
     "Multimedia": "multimedia.png",
     "Presence": "home_pin_FILL0_wght400_GRAD0_opsz48.png",
+    "Print": "print_FILL0_wght400_GRAD0_opsz48.png",
+    "PC": "computer_FILL0_wght400_GRAD0_opsz48.png"
   }
 
   /**

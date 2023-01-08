@@ -27,6 +27,7 @@ import { DetailOverviewComponent } from './detail-overview/detail-overview.compo
 import { StatusComponent } from './status/status.component';
 import { NodeSettingsComponent } from './node-settings/node-settings.component';
 import { HistoryComponent } from './history/history.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 
 
@@ -35,7 +36,8 @@ import { HistoryComponent } from './history/history.component';
     DetailOverviewComponent,
     StatusComponent,
     NodeSettingsComponent,
-    HistoryComponent
+    HistoryComponent,
+    LineChartComponent
   ],
   imports: [
     CommonModule,

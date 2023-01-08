@@ -2,23 +2,13 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    align-items: flex-start;
+    flex-grow: 1;
     column-gap: 10px;
+    max-width: 100%;
 }
 .settings-box > div {
     display: flex;
     flex-direction: column;
-}
-.settings-box > div > mat-form-field {
-    width: 200px;
+    max-width: 100%;
 }
 
-.settings-box > div > mat-list {
-    width: 200px;
-}
-
-.enum-list .mat-list-item-content {
-    color: red;
-    display: flex;
-    justify-content: flex-end;
-}
