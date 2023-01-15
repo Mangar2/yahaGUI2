@@ -10,7 +10,12 @@
             </button>
         </div>
     </div>
-    <button mat-icon-button (click)="onMenu()">
+    <button mat-icon-button [matMenuTriggerFor]="menu">
         <img src="assets/menu_FILL0_wght400_GRAD0_opsz48.png">
     </button>
+    <mat-menu #menu="matMenu">
+        <button *ngFor="let item of menuList" mat-menu-item (click)="onMenu(item.link)">
+            <span>{{ item.name }}</span>
+        </button>
+      </mat-menu>
 </header>

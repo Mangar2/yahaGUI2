@@ -10,6 +10,12 @@ export class HeaderComponent {
 
   topicChunks: string[] = []
 
+  menuList = [ 
+    { name: 'Home', link: 'overview'},
+    { name: 'Settings', link: 'settings'},
+    { name: 'Rules', link: 'rules'}
+  ]
+
   constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
@@ -45,7 +51,7 @@ export class HeaderComponent {
   /**
    * Opens a setting page
    */
-  public onMenu() {
-    this.router.navigate(['yahagui', 'settings']);
+  public onMenu(link: string) {
+    this.router.navigate(['yahagui', link]);
   }
 }

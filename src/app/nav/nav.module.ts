@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list'; 
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 
 import { SidenavComponent } from './sidenav/sidenav.component';
@@ -32,7 +33,8 @@ import { FooterComponent } from './footer/footer.component';
     CommonModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatMenuModule
   ],
   exports: [
     SidenavComponent,
