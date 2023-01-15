@@ -172,9 +172,16 @@ export class SettingDecisions {
    */
   static getIcon(iconName: string, topic: string, topicValue: string) : string | null {
     let pictures = this.icons[iconName] ? this.icons[iconName] : null;
-    if (!pictures) {
+    // Check the last part of the topic first, then the rest. This ensures that 
+    // "temperature and humidity sensor/temperature" shows a temperature icon and not a humidity icon
+    const lastChunk = topic.split('/').at(-1);
+    const checkStrings = [lastChunk, topic];
+    for (const check of checkStrings) {
+      if (pictures) {
+        break;
+      }
       for (const pictureName in this.icons) {
-        if (topic.includes(pictureName.toLowerCase())) {
+        if (check && check.includes(pictureName.toLowerCase())) {
           pictures = this.icons[pictureName];
           break;
         }
