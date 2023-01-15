@@ -1,0 +1,28 @@
+<div *ngIf="rule !== null" class="rule-form">
+    <mat-form-field class="rule-name">
+        <mat-label>rule name</mat-label>
+        <input matInput [value]="rule.name" [readonly]="true">
+    </mat-form-field>
+    <section>
+        <mat-checkbox [(ngModel)]="rule.active" >Enabled</mat-checkbox>
+    </section>
+    <section>
+        <mat-checkbox [(ngModel)]="rule.doLog" >Logging</mat-checkbox>
+    </section>
+    <mat-form-field class="rule-name">
+        <mat-label>Duration</mat-label>
+        <input matInput [value]="rule.duration" [readonly]="true">
+    </mat-form-field>
+    <mat-form-field class="rule-name">
+        <mat-label>Cooldown (s)</mat-label>
+        <input matInput [value]="rule.cooldownInSeconds" [readonly]="true">
+    </mat-form-field>
+    <mat-form-field class="rule-name">
+        <mat-label>Delay (s)</mat-label>
+        <input matInput [value]="rule.delayInSeconds" [readonly]="true">
+    </mat-form-field>
+    <mat-form-field class="rule-name">
+        <mat-label>Quality of Sevice (1, 2, 3)</mat-label>
+        <input matInput [value]="rule.qos" [readonly]="true">
+    </mat-form-field>
+</div>

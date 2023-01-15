@@ -1,0 +1,3 @@
+
+<app-rules-table *ngIf="!showForm" [rules]="rules" (ruleSelected)="onRule($event)"></app-rules-table>
+<app-rule-form *ngIf="showForm" [rule]="rule"></app-rule-form>
