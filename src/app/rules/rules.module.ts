@@ -6,10 +6,13 @@ import { RulesControllerComponent } from './rules-controller/rules-controller.co
 import { RulesTableComponent } from './rules-table/rules-table.component';
 import { RuleFormComponent } from './rule-form/rule-form.component';
 
+import { MatListModule } from '@angular/material/list'; 
+import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { RuleNavComponent } from './rule-nav/rule-nav.component';
 
 
 
@@ -17,11 +20,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
   declarations: [
     RulesControllerComponent,
     RulesTableComponent,
-    RuleFormComponent
+    RuleFormComponent,
+    RuleNavComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
+    MatListModule,
+    MatSelectModule,
     MatFormFieldModule,
     MatTableModule,
     MatInputModule,

@@ -71,4 +71,57 @@ export class RulesService {
     }
     return result;
   }
+
+  /**
+   * Runs through the tree to select a tree node
+   * @param ruleTree tree to search recursively
+   * @param ruleChunks path to the node
+   * @returns node of the tree
+   */
+  getTreeNode(ruleTree: ruleTree_t, ruleChunks:string[] | null): ruleTree_t | any {
+    let result: ruleTree_t | null = ruleTree;
+    if (ruleChunks && ruleChunks.length !== 0) {
+      const newChunks = [...ruleChunks];
+      const ruleChunk = newChunks.shift();
+      if (ruleChunk && ruleTree[ruleChunk]) {
+        result = this.getTreeNode(ruleTree[ruleChunk], newChunks);
+      } else {
+        result = null;
+      }
+    }
+    return result;
+  }
+
+
+  /**
+   * Converts a rule tree to a rule list
+   * @param ruleTree tree of rules
+   * @param name current name => fills recursively, leave blank!
+   */
+  getRuleChunkList(ruleTree: ruleTree_t, ruleChunks: string[] | null): string[] {
+    const treeNode: ruleTree_t | null = this.getTreeNode(ruleTree, ruleChunks);
+    let result: string[] = [];
+    if (treeNode) {
+      for (const ruleChunk in treeNode) {
+        result.push(ruleChunk);
+      }
+    } 
+    return result;
+  }
+
+  /**
+   * Gets a rule from the rule tree
+   * @param ruleTree tree with rules
+   * @param ruleChunks path to the rule
+   * @returns the rule or null if the rule is not found
+   */
+  getRule(ruleTree: ruleTree_t, ruleChunks:string[] | null): rule_t | null {
+    let result: rule_t | null = null;
+    const treeNode: ruleTree_t | any = this.getTreeNode(ruleTree, ruleChunks);
+    if (treeNode) {
+      result = treeNode;
+    }
+    return result;
+  }
+
 }

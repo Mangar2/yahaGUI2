@@ -1,28 +1,34 @@
 <div *ngIf="rule !== null" class="rule-form">
     <mat-form-field class="rule-name">
         <mat-label>rule name</mat-label>
-        <input matInput [value]="rule.name" [readonly]="true">
+        <input matInput [value]="getStringProperty('name')" [readonly]="true">
     </mat-form-field>
     <section>
-        <mat-checkbox [(ngModel)]="rule.active" >Enabled</mat-checkbox>
+        <mat-checkbox [checked]="getStringProperty('active')">Enabled</mat-checkbox>
     </section>
     <section>
-        <mat-checkbox [(ngModel)]="rule.doLog" >Logging</mat-checkbox>
+        <mat-checkbox [checked]="getStringProperty('doLog')" >Logging</mat-checkbox>
     </section>
     <mat-form-field class="rule-name">
+        <mat-label>Time</mat-label>
+        <input matInput [value]="getStringProperty('time')">
+    </mat-form-field>
+    <mat-form-field class="rule-name">
         <mat-label>Duration</mat-label>
-        <input matInput [value]="rule.duration" [readonly]="true">
+        <input matInput [value]="getStringProperty('duration')">
     </mat-form-field>
     <mat-form-field class="rule-name">
         <mat-label>Cooldown (s)</mat-label>
-        <input matInput [value]="rule.cooldownInSeconds" [readonly]="true">
+        <input matInput [value]="getStringProperty('cooldownInSeconds')">
     </mat-form-field>
     <mat-form-field class="rule-name">
         <mat-label>Delay (s)</mat-label>
-        <input matInput [value]="rule.delayInSeconds" [readonly]="true">
+        <input matInput [value]="getStringProperty('delayInSeconds')">
     </mat-form-field>
-    <mat-form-field class="rule-name">
-        <mat-label>Quality of Sevice (1, 2, 3)</mat-label>
-        <input matInput [value]="rule.qos" [readonly]="true">
+    <mat-form-field appearance="fill" class="rule-name">
+        <mat-label>Quality of Sevice</mat-label>
+        <mat-select [(value)]="rule.qos" >
+            <mat-option *ngFor="let qos of qosValues" value="getStringProperty('qos')">{{qos}}</mat-option>
+        </mat-select>
     </mat-form-field>
 </div>

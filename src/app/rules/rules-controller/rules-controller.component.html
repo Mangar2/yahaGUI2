@@ -1,3 +1,6 @@
 
-<app-rules-table *ngIf="!showForm" [rules]="rules" (ruleSelected)="onRule($event)"></app-rules-table>
-<app-rule-form *ngIf="showForm" [rule]="rule"></app-rule-form>
+<main>
+    <app-rule-nav [chunkList]="chunkList" (chunkSelected)="onChunkSelected($event)"></app-rule-nav>
+    <app-rules-table *ngIf="!showForm" [rules]="rules" (ruleSelected)="onRule($event)"></app-rules-table>
+    <app-rule-form *ngIf="showForm" [rule]="rule"></app-rule-form>
+</main>
