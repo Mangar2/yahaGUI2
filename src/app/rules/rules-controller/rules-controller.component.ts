@@ -1,5 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { MessagesService } from 'src/app/api/messages.service';
 import { RulesService, rules_t, ruleTree_t, rule_t } from 'src/app/api/rules.service';
 
 @Component({
@@ -13,9 +14,9 @@ export class RulesControllerComponent {
   ruleTree: ruleTree_t | null = null;
   ruleChunks: string[] = [];
   chunkList: string[] | null = null;
-  showForm: boolean = false;
+  activeChunk: string | null = null;
 
-  constructor(private rulesService: RulesService) {
+  constructor(private rulesService: RulesService, private messagesService: MessagesService) {
   }
 
   ngOnInit() {
@@ -30,7 +31,8 @@ export class RulesControllerComponent {
 
   onRule(rule: rule_t) {
     this.rule = rule;
-    this.showForm = true;
+    const last = rule.name?.at(-1);
+    this.activeChunk = last ? last : null; 
   }
 
   /**
@@ -56,6 +58,15 @@ export class RulesControllerComponent {
   }
 
   /**
+   * Saves any changed rules and informs the rules processor to upload a new set of rules
+   */
+  onUploadSelected() {
+    this.messagesService.publish('$SYS/automation/update', 'on', '').subscribe((res) => {
+      console.log(res);
+    });
+  }
+
+  /**
    * Navigates in the rule-tree
    * @param chunk selected navigation item
    */
@@ -65,12 +76,15 @@ export class RulesControllerComponent {
     }
     
     if (chunk === '<') {
-      this.ruleChunks.pop();
-      if (this.ruleChunks.at(-1) === 'rules') {
-        // remove 'rules' and the selection before
+      if (this.isRule(this.ruleChunks)) {
+        // Expra pop for rulechunks, because they are not shown in the nav-bar
         this.ruleChunks.pop();
+      }
+      const popped = this.ruleChunks.pop();
+      if (popped === 'rules') {
+        // Extra pop for rules as they are not shown in the nav-bar
         this.ruleChunks.pop();
-        this.showForm = false;
+        this.activeChunk = null;
       }
     } else if (this.chunkList && this.chunkList.includes(chunk)) {
       if (this.isRule(this.ruleChunks)) {
@@ -80,7 +94,11 @@ export class RulesControllerComponent {
     }
     if (this.isRule(this.ruleChunks)) {
       this.rule = this.rulesService.getRule(this.ruleTree, this.ruleChunks)
-      this.showForm = true;
+      if (this.rule) {
+        this.rule.name = this.ruleChunks.join('/').replace('rules/', '');
+      }
+      const lastChunk = this.ruleChunks.at(-1);
+      this.activeChunk = lastChunk ? lastChunk : null;
     } else {
       this.updateRuleList(this.ruleTree);
     }

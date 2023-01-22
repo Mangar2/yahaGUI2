@@ -1,9 +1,16 @@
 <aside>
     <mat-nav-list *ngIf="chunkList">
-        <mat-list-item *ngFor="let chunk of chunkList" class="nav-button" (click)="onSelect(chunk)">
-            <span class="nav-button-text">{{chunk}}</span>
+        <mat-list-item *ngFor="let chunk of chunkList" class="nav-button"
+            [class.nav-button-active]="isActive(chunk)" [class.nav-button-normal]="!isActive(chunk)"
+            (click)="onSelect(chunk)">
+            <span 
+                [class.nav-button-text-active]="isActive(chunk)"
+                [class.nav-button-text-normal]="!isActive(chunk)">
+                {{chunk}}
+            </span>
         </mat-list-item>
-        <mat-list-item  class="upload-button" (click)="upload()">
+
+        <mat-list-item class="upload-button" (click)="upload()">
             upload
         </mat-list-item>
     </mat-nav-list>

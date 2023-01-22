@@ -65,9 +65,9 @@ export class MessagesService {
      * @param topic topic to look for
      * @param value value to set
      */
-    publish(topic: string, value: string): Observable<HttpResponse<PublishResult>> {
+    publish(topic: string, value: string, append: string = '/set'): Observable<HttpResponse<PublishResult>> {
         const data = {
-            topic: topic + '/set',
+            topic: topic + append,
             value: value,
             timestamp: (new Date()).toISOString()
         }

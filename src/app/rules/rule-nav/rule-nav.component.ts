@@ -9,6 +9,9 @@ export class RuleNavComponent {
 
   _chunkList: string[] | null = null;
   @Output() chunkSelected = new EventEmitter<string>();
+  @Output() uploadSelected = new EventEmitter<void>();
+
+  @Input() activeChunk: string | null = null;
 
   @Input() 
   set chunkList(chunkList: string[] | null) {
@@ -19,12 +22,17 @@ export class RuleNavComponent {
     return this._chunkList;
   }
 
+  /**
+   * Returns true, if an element shall be show as active 
+   * @param chunk currently shown element
+   * @returns 
+   */
   isActive(chunk: string): boolean {
-    return false;
+    return chunk === this.activeChunk;
   }
 
   upload(): void {
-
+    this.uploadSelected.emit();
   }
 
   onSelect(chunk: string): void {

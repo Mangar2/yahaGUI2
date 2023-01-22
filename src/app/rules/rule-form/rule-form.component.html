@@ -1,34 +1,78 @@
 <div *ngIf="rule !== null" class="rule-form">
+    <div class="header">
+        <button *ngFor="let button of navButtons" (click)="onClick(button.text)">
+            <img src="{{'assets/' + button.img}}" class="button-image">
+            {{button.text}}
+        </button>
+    </div>
     <mat-form-field class="rule-name">
         <mat-label>rule name</mat-label>
         <input matInput [value]="getStringProperty('name')" [readonly]="true">
     </mat-form-field>
-    <section>
-        <mat-checkbox [checked]="getStringProperty('active')">Enabled</mat-checkbox>
-    </section>
-    <section>
-        <mat-checkbox [checked]="getStringProperty('doLog')" >Logging</mat-checkbox>
-    </section>
-    <mat-form-field class="rule-name">
+    <div>
+        <section>
+            <mat-checkbox [(ngModel)]="rule.active">Enabled</mat-checkbox>
+        </section>
+        <section>
+            <mat-checkbox [(ngModel)]="rule.doLog">Logging</mat-checkbox>
+        </section>
+    </div>
+    <mat-form-field class="rule-textarea">
         <mat-label>Time</mat-label>
-        <input matInput [value]="getStringProperty('time')">
+        <textarea matInput rows="{{getRows('time')}}" [value]="getStringProperty('time')"></textarea>
+    </mat-form-field>    
+    <div>
+        <mat-form-field class="rule-small-input">
+            <mat-label>Duration</mat-label>
+            <input matInput [(ngModel)]="rule.duration">
+        </mat-form-field>
+        <mat-form-field class="rule-small-input">
+            <mat-label>Cooldown (s)</mat-label>
+            <input matInput [(ngModel)]="rule.cooldownInSeconds">
+        </mat-form-field>
+        <mat-form-field class="rule-small-input">
+            <mat-label>Delay (s)</mat-label>
+            <input matInput [(ngModel)]="rule.delayInSeconds">
+        </mat-form-field>
+        <mat-form-field class="rule-small-input">
+            <mat-label>Duration w.o. mov. in min.</mat-label>
+            <input matInput [(ngModel)]="rule.durationWithoutMovementInMinutes">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="rule-small-input">
+            <mat-label>Quality of Sevice</mat-label>
+            <mat-select [(value)]="rule.qos">
+                <mat-option *ngFor="let qos of qosValues" value="{{qos}}">{{qos}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <mat-form-field *ngIf="_rule && _rule.allOf" class="rule-textarea">
+        <mat-label>All Of</mat-label>
+        <textarea matInput rows="{{getRows('allOf')}}" [value]="getStringProperty('allOf')"></textarea>
     </mat-form-field>
-    <mat-form-field class="rule-name">
-        <mat-label>Duration</mat-label>
-        <input matInput [value]="getStringProperty('duration')">
+    <mat-form-field  *ngIf="_rule && _rule.anyOf" class="rule-textarea">
+        <mat-label>Any Of</mat-label>
+        <textarea matInput rows="{{getRows('anyOf')}}" [(ngModel)]="rule.anyOf"></textarea>
     </mat-form-field>
-    <mat-form-field class="rule-name">
-        <mat-label>Cooldown (s)</mat-label>
-        <input matInput [value]="getStringProperty('cooldownInSeconds')">
+    <mat-form-field  *ngIf="_rule && _rule.allow" class="rule-textarea">
+        <mat-label>Allow</mat-label>
+        <textarea matInput rows="{{getRows('allow')}}" [value]="getStringProperty('allow')"></textarea>
     </mat-form-field>
-    <mat-form-field class="rule-name">
-        <mat-label>Delay (s)</mat-label>
-        <input matInput [value]="getStringProperty('delayInSeconds')">
+    <mat-form-field *ngIf="_rule && _rule.noneOf" class="rule-textarea">
+        <mat-label>None Of</mat-label>
+        <textarea matInput rows="{{getRows('noneOf')}}" [value]="getStringProperty('noneOf')"></textarea>
     </mat-form-field>
-    <mat-form-field appearance="fill" class="rule-name">
-        <mat-label>Quality of Sevice</mat-label>
-        <mat-select [(value)]="rule.qos" >
-            <mat-option *ngFor="let qos of qosValues" value="getStringProperty('qos')">{{qos}}</mat-option>
-        </mat-select>
+    
+    <mat-form-field *ngIf="_rule && _rule.check" class="rule-textarea">
+        <mat-label>Check</mat-label>
+        <textarea matInput rows="{{getRows('check')}}" [value]="getStringProperty('check')"></textarea>
+    </mat-form-field>
+    <mat-form-field *ngIf="_rule && _rule.value" class="rule-textarea">
+        <mat-label>Value</mat-label>
+        <textarea matInput rows="{{getRows('value')}}" [value]="getStringProperty('value')"></textarea>
+    </mat-form-field>
+    <mat-form-field class="rule-textarea">
+        <mat-label>Topic</mat-label>
+        <textarea matInput rows="{{getRows('topic')}}" [value]="getStringProperty('topic')"></textarea>
     </mat-form-field>
 </div>
