@@ -18,7 +18,7 @@ export type rule_t = {
   check?: rule,
   value?: rule,
   time?: string | rule,
-  day?: string | string[],
+  weekDay?: string | string[],
   duration?: number | string,
   cooldownInSeconds?: number,
   delayInSeconds?: number,

@@ -1,6 +1,6 @@
 <div *ngIf="rule !== null" class="rule-form">
     <div class="header">
-        <button *ngFor="let button of navButtons" (click)="onClick(button.text)">
+        <button *ngFor="let button of navButtons" (click)="onClick(button.text)" [disabled]="hasErrors">
             <img src="{{'assets/' + button.img}}" class="button-image">
             {{button.text}}
         </button>
@@ -17,11 +17,19 @@
             <mat-checkbox [(ngModel)]="_rule['doLog']">Logging</mat-checkbox>
         </section>
     </div>
-    <mat-form-field class="rule-textarea">
-        <mat-label>Time</mat-label>
-        <textarea matInput rows="{{getRows('time')}}" [(ngModel)]="_rule['time']"></textarea>
-        <div *ngIf="isInvalidField('time')" class="alert">{{getErrorMessage('time')}}</div>
-    </mat-form-field>    
+    <div>
+        <mat-form-field class="rule-large-input">
+            <mat-label>Time</mat-label>
+            <textarea matInput rows="{{getRows('time')}}" [(ngModel)]="_rule['time']"></textarea>
+            <div *ngIf="isInvalidField('time')" class="alert">{{getErrorMessage('time')}}</div>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="rule-small-input">
+            <mat-label>Day of Week</mat-label>
+            <mat-select [(value)]="_rule['weekDays']" multiple>
+                <mat-option *ngFor="let day of weekDays" value="{{day}}">{{day}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
     <div>
         <mat-form-field class="rule-small-input">
             <mat-label>Duration</mat-label>
@@ -50,8 +58,9 @@
 
     <mat-form-field *ngFor="let field of showFields" class="rule-textarea">
         <mat-label>{{field.label}}</mat-label>
-        <textarea matInput rows="{{getRows(field.name)}}" [(ngModel)]="_rule[field.name]"></textarea>
+        <textarea matInput rows="{{getRows(field.name)}}" [(ngModel)]="_rule[field.name]"
+            (ngModelChange)="onChange(field.name)"></textarea>
         <div *ngIf="isInvalidField(field.name)" class="alert">{{getErrorMessage(field.name)}}</div>
     </mat-form-field>
-    
+
 </div>

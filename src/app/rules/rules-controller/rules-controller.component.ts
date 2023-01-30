@@ -9,7 +9,6 @@ import { RulesService, rules_t, ruleTree_t, rule_t } from 'src/app/api/rules.ser
   styleUrls: ['./rules-controller.component.less']
 })
 export class RulesControllerComponent {
-  rules: rules_t | null = null;
   rule: rule_t | null = null;
   ruleTree: ruleTree_t | null = null;
   ruleChunks: string[] = [];
@@ -23,16 +22,27 @@ export class RulesControllerComponent {
     this.rulesService.readRules().subscribe((res: HttpResponse<ruleTree_t>) => {
       if (res.status === 200 && res.body) {
         this.ruleTree = res.body;
-        this.rules = this.rulesService.treeToList(this.ruleTree);
         this.chunkList = this.rulesService.getRuleChunkList(this.ruleTree, this.ruleChunks);
       }
     })
   }
 
-  onRule(rule: rule_t) {
-    this.rule = rule;
-    const last = rule.name?.at(-1);
-    this.activeChunk = last ? last : null; 
+  /**
+   * Performs an action for a rule, supported actions are "save", "delete", "reload"
+   * @param action action to perform
+   */
+  onRuleAction(action: { command: string, rule: rule_t}) {
+    const topic = `$SYS/automation/${this.ruleChunks.join('/')}`;
+    if (action.command === "save") {
+      const value = JSON.stringify(action.rule);
+      this.messagesService.publish(topic, value).subscribe((res) => {
+        console.log(res);
+      });
+    } else if (action.command === "delete") {
+      this.messagesService.publish(topic, 'deleted').subscribe((res) => {
+        console.log(res);
+      });
+    }
   }
 
   /**

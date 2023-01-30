@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { rule_t } from 'src/app/api/rules.service';
 import { ErrorList, Parser } from './parser';
+import { stringify } from './stringify';
 
 type fieldInfo_t = {  name: keyof rule_t, label: string, class: string }
 
@@ -13,13 +14,12 @@ export class RuleFormComponent {
 
   @Output() ruleAction = new EventEmitter<{ command: string, rule: rule_t }>();
 
-  _rule: { [index: string]: string | undefined | number } = {};
+  _rule: { [index: string]: any } = {};
+  _errors: { [index: string]: ErrorList } = {};
+  hasErrors: boolean = false;
   qosValues = [0, 1, 2];
+  weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   navButtons = [
-    {
-      img: "rule_FILL0_wght400_GRAD0_opsz48.png",
-      text: "test"
-    },
     {
       img: "save_FILL0_wght400_GRAD0_opsz48.png",
       text: "save"
@@ -34,7 +34,11 @@ export class RuleFormComponent {
     }
   ]
 
-  defaultValues: { [index: string]: boolean | string | number } = {
+  /**
+   * Default value of a rule member if the member is undefined
+   * Members having this value are removed from the result
+   */
+  defaultValues: { [index: string]: any } = {
     active: true,
     doLog: false,
     cooldownInSeconds: 0,
@@ -48,6 +52,7 @@ export class RuleFormComponent {
     anyOf: "",
     noneOf: "",
     time: "",
+    weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     value: ""
   }
 
@@ -65,25 +70,8 @@ export class RuleFormComponent {
 
   @Input() set rule(rule: rule_t | null) {
     if (rule !== null) {
-      this._rule = { 
-        name: rule.name,
-        active: rule.active === undefined || rule.active === true ? 1 : 0,
-        doLog: rule.doLog === undefined || rule.doLog === false ? 0 : 1,
-        time: this.stringify(rule.time),
-        duration: String(rule.duration || ""),
-        cooldownInSeconds: String(rule.cooldownInSeconds || ""),
-        delayInSeconds: String(rule.delayInSeconds || ""),
-        durationWithoutMovementInMinutes: String(rule.durationWithoutMovementInMinutes || ""),
-        qos: String(rule.qos || 0),
-        allOf: this.stringify(rule.allOf),
-        allow: this.stringify(rule.allow),
-        anyOf: this.stringify(rule.anyOf),
-        check: this.stringify(rule.check),
-        noneOf: this.stringify(rule.noneOf),
-        topic: this.stringify(rule.topic),
-        value: this.stringify(rule.value)
-      };
-      this.showFields = [];
+      this._rule =this.ruleToDisplayObject(rule);
+      this.showFields = []; 
       for (let field of this.inputFields) {
         if (this._rule[field.name] !== "") {
           this.showFields.push(field);
@@ -93,39 +81,32 @@ export class RuleFormComponent {
   }
 
   /**
-   * Stringifies a JSON object in a convinient way to display it
-   * @param object 
+   * Converts a rule in an object of displayable fields
+   * @param rule rule to convert
+   * @returns object having strings or numbers for any displayable field
    */
-  stringify(object: any, indent: string = ''): string {
-    let result: string = "";
-    const sub: string[] = [];
-    if (Array.isArray(object)) {
-      let totalLen = 0;
-      let noObject = true;
-      for (const elem of object) {
-        noObject &&= !Array.isArray(elem) && typeof elem !== 'object';
-        const newStr = this.stringify(elem, indent + '  ');
-        totalLen += newStr.length;
-        sub.push(newStr);
-      }
-      if (totalLen < 60 && noObject) {
-        result = `[ ${sub.join(', ')} ]`;
-      } else if (sub[0].length < 10) {
-        result = `[ ${sub.join(',\n  ' + indent)}\n${indent}]`;
-      } else {
-        result = `[\n  ${indent + sub.join(',\n  ' + indent)}\n${indent}]`;
-      }
-    } else if (typeof object === 'object') {
-      for (const index in object) {
-        const elem = object[index];
-        sub.push(`"${index}": ${this.stringify(elem, indent + '  ')}`)
-      }
-      result = `{\n  ${indent + sub.join(',\n  ' + indent)}\n${indent}}`;
-    } else if (object !== undefined) {
-      result = `"${object}"`;
-    }
-    return result;
+  private ruleToDisplayObject(rule: rule_t) {
+    return { 
+      name: rule.name,
+      active: rule.active === undefined || rule.active === true ? 1 : 0,
+      doLog: rule.doLog === undefined || rule.doLog === false ? 0 : 1,
+      time: stringify(rule.time),
+      weekDays: rule.weekDay || this.defaultValues['weekDays'],
+      duration: rule.duration || this.defaultValues['duration'],
+      cooldownInSeconds: rule.cooldownInSeconds || this.defaultValues['cooldownInSeconds'],
+      delayInSeconds: rule.delayInSeconds || this.defaultValues['delayInSeconds'],
+      durationWithoutMovementInMinutes: rule.durationWithoutMovementInMinutes || this.defaultValues['durationWithoutMovementInMinutes'],
+      qos: String(rule.qos || 0),
+      allOf: stringify(rule.allOf),
+      allow: stringify(rule.allow),
+      anyOf: stringify(rule.anyOf),
+      check: stringify(rule.check),
+      noneOf: stringify(rule.noneOf),
+      topic: stringify(rule.topic),
+      value: stringify(rule.value)
+    };
   }
+
 
   /**
    * Calculates the number of rows in a textarea
@@ -165,6 +146,7 @@ export class RuleFormComponent {
       active: this._rule["active"] ? true : false,
       doLog: this._rule["doLog"] ? true : false,
       time: this.parse(this._rule['time']).parsed,
+      weekDay: this._rule['weekDay'],
       duration: this._rule["duration"],
       cooldownInSeconds: Number(this._rule["cooldownInSeconds"]),
       delayInSeconds: Number(this._rule["delayInSeconds"]),
@@ -188,13 +170,35 @@ export class RuleFormComponent {
   }
 
   /**
+   * Checks a rule member for errors
+   * @param memberName name of the rule index
+   */
+  onChange(memberName: string) {
+    if (this._rule[memberName] === undefined) {
+      return;
+    }
+    const content = this._rule[memberName];
+    const parsed = this.parse(content);
+    this._errors[memberName] = parsed.error;
+    this.hasErrors = false;
+    for (const index in this._errors) {
+      if (this._errors[index].hasErrors()) {
+        this.hasErrors = true;
+        break;
+      }
+    }
+  }
+
+  /**
    * Reacts on a click of a header button and executes the command
    * @param name of the clicked command
    */
   onClick(name: string) {
     console.log(name);
-    const rule = this.formToRule();
-    this.ruleAction.emit({ command: name, rule })
+    if (!this.hasErrors) {
+      const rule = this.formToRule();
+      this.ruleAction.emit({ command: name, rule })
+    }
   }
 
   /**
@@ -203,12 +207,7 @@ export class RuleFormComponent {
    * @returns true, if the field has invalid content
    */
   isInvalidField(name: string): boolean {
-    if (this._rule[name] === undefined) {
-      return false;
-    }
-    const parsed = this.parse(this._rule[name]);
-    const hasErrors = parsed.error.hasErrors();
-    return hasErrors;
+    return this._errors[name] ? this._errors[name].hasErrors() : false;
   }
 
   /**
@@ -217,13 +216,11 @@ export class RuleFormComponent {
    * @returns Error message for the field
    */
   getErrorMessage(name: string): string {
-    if (this._rule[name] === undefined) {
-      return "";
-    }
-    const parsed = this.parse(this._rule[name]);
+    const errors = this._errors[name];    
     let result = "";
-    if (parsed.error.hasErrors()) {
-      const err = parsed.error.errors[0];
+
+    if (errors !== undefined && errors.hasErrors()) {
+      const err = errors.errors[0];
       result =  `Error ${err.description} ${err.line}:${err.pos}`;
     }
     return result;
