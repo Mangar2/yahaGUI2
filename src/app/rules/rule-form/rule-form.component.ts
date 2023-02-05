@@ -15,8 +15,9 @@ export class RuleFormComponent {
   @Output() ruleAction = new EventEmitter<{ command: string, rule: rule_t }>();
 
   _rule: { [index: string]: any } = {};
-  _errors: { [index: string]: ErrorList } = {};
+  private _errors: { [index: string]: ErrorList } = {};
   hasErrors: boolean = false;
+  folded: boolean = true;
   qosValues = [0, 1, 2];
   weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   navButtons = [
@@ -31,6 +32,14 @@ export class RuleFormComponent {
     {
       img: "upgrade_FILL0_wght400_GRAD0_opsz48.png",
       text: "reload"
+    },
+    {
+      img: "content_copy_FILL0_wght400_GRAD0_opsz48.png",
+      text: "copy"
+    },
+    {
+      img: "unfold_more_FILL0_wght400_GRAD0_opsz48.png",
+      text: "unfold"
     }
   ]
 
@@ -69,13 +78,22 @@ export class RuleFormComponent {
   showFields: fieldInfo_t[] = []
 
   @Input() set rule(rule: rule_t | null) {
+    console.log("set");
+    console.log(rule);
     if (rule !== null) {
       this._rule =this.ruleToDisplayObject(rule);
-      this.showFields = []; 
-      for (let field of this.inputFields) {
-        if (this._rule[field.name] !== "") {
-          this.showFields.push(field);
-        }
+      this.setShowFields();
+    }
+  }
+
+  /**
+   * Sets the fields to show
+   */
+  private setShowFields() {
+    this.showFields = []; 
+    for (let field of this.inputFields) {
+      if (this._rule[field.name] !== "" || !this.folded) {
+        this.showFields.push(field);
       }
     }
   }
@@ -86,8 +104,13 @@ export class RuleFormComponent {
    * @returns object having strings or numbers for any displayable field
    */
   private ruleToDisplayObject(rule: rule_t) {
+    const nameChunks = rule.name?.split('/');
+    const name = nameChunks && nameChunks.length >= 1 ? nameChunks.at(-1): '';
+    nameChunks?.pop();
+    const prefix = nameChunks? nameChunks.join('/') : '';
     return { 
-      name: rule.name,
+      prefix,
+      name,
       active: rule.active === undefined || rule.active === true ? 1 : 0,
       doLog: rule.doLog === undefined || rule.doLog === false ? 0 : 1,
       time: stringify(rule.time),
@@ -142,7 +165,7 @@ export class RuleFormComponent {
    */
   formToRule(): rule_t {
     const saveRule: rule_t = { 
-      name: this.rule?.name,
+      name: this._rule ? this._rule['prefix'] + '/' + this._rule['name'] : '',
       active: this._rule["active"] ? true : false,
       doLog: this._rule["doLog"] ? true : false,
       time: this.parse(this._rule['time']).parsed,
@@ -195,7 +218,17 @@ export class RuleFormComponent {
    */
   onClick(name: string) {
     console.log(name);
-    if (!this.hasErrors) {
+    if (name === 'unfold' || name === 'fold') {
+      for (const button of this.navButtons) {
+        if (button.text === 'unfold')  {
+          button.text = 'fold'
+        } else if (button.text === 'fold') {
+          button.text = 'unfold';
+        }
+      }
+      this.folded = name === 'fold';
+      this.setShowFields();
+    } else if (!this.hasErrors) {
       const rule = this.formToRule();
       this.ruleAction.emit({ command: name, rule })
     }

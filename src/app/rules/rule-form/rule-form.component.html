@@ -5,10 +5,16 @@
             {{button.text}}
         </button>
     </div>
-    <mat-form-field class="rule-name">
-        <mat-label>rule name</mat-label>
-        <input matInput [(ngModel)]="_rule['name']" [readonly]="true">
-    </mat-form-field>
+    <div>
+        <mat-form-field class="rule-small-input">
+            <mat-label>rule path</mat-label>
+            <input matInput [value]="_rule['prefix']" [readonly]="true">
+        </mat-form-field>
+        <mat-form-field class="rule-small-input">
+            <mat-label>rule name</mat-label>
+            <input matInput [(ngModel)]="_rule['name']">
+        </mat-form-field>
+    </div>
     <div>
         <section>
             <mat-checkbox [(ngModel)]="_rule['active']">Enabled</mat-checkbox>

@@ -27,16 +27,18 @@ export class RuleNavComponent {
    * @param chunk currently shown element
    * @returns 
    */
-  isActive(chunk: string): boolean {
-    return chunk === this.activeChunk;
-  }
-
-  newRule(): void {
-    this.newRuleSelected.emit();
+  getType(chunk: string): string {
+    if (chunk === this.activeChunk) return 'active';
+    if (chunk === 'add rule') return 'new';
+    return 'nav';
   }
 
   onSelect(chunk: string): void {
-    this.chunkSelected.emit(chunk);
+    if (chunk === 'add rule') {
+      this.newRuleSelected.emit();
+    } else {
+      this.chunkSelected.emit(chunk);
+    }
   }
 
 }

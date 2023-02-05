@@ -1,17 +1,16 @@
 <aside>
     <mat-nav-list *ngIf="chunkList">
         <mat-list-item *ngFor="let chunk of chunkList" class="nav-button"
-            [class.nav-button-active]="isActive(chunk)" [class.nav-button-normal]="!isActive(chunk)"
+            [class.nav-button-active]="getType(chunk) === 'active'" 
+            [class.nav-button-normal]="getType(chunk) === 'nav'"
+            [class.nav-button-new]="getType(chunk) === 'new'"
             (click)="onSelect(chunk)">
             <span 
-                [class.nav-button-text-active]="isActive(chunk)"
-                [class.nav-button-text-normal]="!isActive(chunk)">
+                [class.nav-button-text-active]="getType(chunk) === 'active'"
+                [class.nav-button-text-normal]="getType(chunk) === 'nav'"
+                [class.nav-button-text-new]="getType(chunk) === 'new'">
                 {{chunk}}
             </span>
-        </mat-list-item>
-
-        <mat-list-item class="new-button" (click)="newRule()">
-            new rule
         </mat-list-item>
     </mat-nav-list>
 </aside>
