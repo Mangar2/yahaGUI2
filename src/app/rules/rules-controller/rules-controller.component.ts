@@ -18,10 +18,12 @@ export class RulesControllerComponent {
   }
 
   ngOnInit() {
+    this.updateNavList();
     this.rulesService.readRules().subscribe((res: HttpResponse<ruleTree_t>) => {
       if (res.status === 200 && res.body) {
         this.rulesService.setRules(res.body);
-        this.navList = this.rulesService.getNameList(this.rulePath);
+        this.updateNavList();
+        this.rulesService.writeRulesToLocalStore();
       }
     })
   }
@@ -33,12 +35,16 @@ export class RulesControllerComponent {
    */
   private updateRule(rulePath: RulePath, rule: rule_t) {
     if (rule.name !== undefined) {
-      this.rulesService.updateTreeNode(rulePath, rule);
       let nameChunks = rule.name.split('/');
-      const name = nameChunks.at(-1);
+      const name = nameChunks.pop();
       if (name !== undefined) {
+        const newPath = new RulePath(nameChunks);
+        newPath.name = name;
+        console.log(newPath);
+        this.rulesService.updateTreeNode(newPath, rule);
         this.updateNavList();
         this.onChunkSelected(name);
+        this.rulesService.writeRulesToLocalStore();
       }
     }
   }
@@ -51,6 +57,7 @@ export class RulesControllerComponent {
     this.rulesService.deleteRule(rulePath);
     this.updateNavList();
     this.onChunkSelected(null);
+    this.rulesService.writeRulesToLocalStore();
   }
 
   /**
@@ -71,18 +78,20 @@ export class RulesControllerComponent {
    */
   onRuleAction(action: { command: string, rule: rule_t }) {
 
-    const topic = `$SYS/automation/${this.rulePath.toTopic()}`;
+    const topic = `$SYS/automation/rules/${action.rule.name}`;
     if (action.command === "copy" && action.rule.name) {
       action.rule.name += '-copy';
       const newName: string = action.rule.name.split('/').at(-1) || "";
       this.rulePath.name = newName;
       this.updateRule(this.rulePath, action.rule);
     } else if (action.command === "save" && action.rule.name) {
+      console.log(action.rule.name);
+      console.log(this.rulePath.toTopic());
       this.updateRule(this.rulePath, action.rule);
       this.publishRule(action.rule, topic);
     } else if (action.command === "delete") {
       this.deleteRule(this.rulePath);
-      this.messagesService.publish(topic, 'deleted').subscribe((res) => {
+      this.messagesService.publish(topic, 'delete').subscribe((res) => {
         console.log(res);
       });
     } else if (action.command === "reload") {
@@ -102,6 +111,7 @@ export class RulesControllerComponent {
     if (!this.rulePath.isEmpty()) {
       list.unshift('<');
     }
+    list.push('add folder');
     if (this.rulesService.isRuleNode(this.rulePath)) {
       list.push('add rule');
     }
@@ -111,14 +121,18 @@ export class RulesControllerComponent {
   /**
    * opens a new empty rule
    */
-  newRule() {
-    this.rulePath.name = 'new';
-    const newRule = {
-      name: this.rulePath.toTopic(),
-      topic: ""
+  addSelected(command: string) {
+    if (command === 'rule') {
+      this.rulePath.name = 'new';
+      const newRule = {
+        name: this.rulePath.toTopic(),
+        topic: ""
+      }
+      this.updateRule(this.rulePath, newRule);
+      this.rule = newRule;
+    } else if (command === 'folder') {
+
     }
-    this.updateRule(this.rulePath, newRule);
-    this.rule = newRule;
   }
 
   /**

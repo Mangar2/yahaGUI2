@@ -8,7 +8,7 @@
     <div>
         <mat-form-field class="rule-small-input">
             <mat-label>rule path</mat-label>
-            <input matInput [value]="_rule['prefix']" [readonly]="true">
+            <input matInput [(ngModel)]="_rule['prefix']">
         </mat-form-field>
         <mat-form-field class="rule-small-input">
             <mat-label>rule name</mat-label>
@@ -21,6 +21,9 @@
         </section>
         <section>
             <mat-checkbox [(ngModel)]="_rule['doLog']">Logging</mat-checkbox>
+        </section>
+        <section>
+            <mat-checkbox [(ngModel)]="_rule['isValid']" [disabled]="true">Is Valid</mat-checkbox>
         </section>
     </div>
     <div>

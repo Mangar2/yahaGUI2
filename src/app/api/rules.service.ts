@@ -9,6 +9,7 @@ export type rule_t = {
   name?: string,
   doLog?: boolean,
   active?: boolean,
+  isValid?: boolean,
   durationWithoutMovementInMinutes?: number,
   allOf?: string | string[],
   anyOf?: string | string[],
@@ -18,7 +19,7 @@ export type rule_t = {
   check?: rule,
   value?: rule,
   time?: string | rule,
-  weekDay?: string | string[],
+  weekDays?: string | string[],
   duration?: number | string,
   cooldownInSeconds?: number,
   delayInSeconds?: number,
@@ -103,6 +104,11 @@ export class RulePath {
   toTopic = () => this.removeRule().join('/');
 
   /**
+   * @returns the path as string separated by '/'
+   */
+  toString = () => this.chunks.join('/');
+
+  /**
    * Checks, if the chunk list is empty
    * @returns true, if the chunk list is empty
    */
@@ -144,7 +150,10 @@ export class RulePath {
 export class RulesService {
 
   rules: ruleTree_t = {}
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) { 
+    this.rules = this.getRulesFromLocalStore()
+  }
+  storeName = "yaha_rules";
 
 
   /**
@@ -154,6 +163,32 @@ export class RulesService {
   readRules(): Observable<HttpResponse<ruleTree_t>> {
     const topic = 'automation/rules';
     return this.httpClient.get<ruleTree_t>(environment.configHost + topic, { observe: 'response' });
+  }
+
+  /**
+   * Gets the rules tree from the local store
+   */
+  private getRulesFromLocalStore() {
+    let rules = {}
+    const storedData = localStorage.getItem(this.storeName)
+    if (storedData) {
+      try {
+        rules = JSON.parse(storedData);
+      }
+      catch (err) {
+        console.error(err);
+      }
+    }
+    return rules
+  }
+
+  /**
+   * Writes the rules tree to the local store
+   */
+  public writeRulesToLocalStore() {
+    if (this.rules) {
+      localStorage.setItem(this.storeName, JSON.stringify(this.rules));
+    }
   }
 
   setRules(rules: ruleTree_t) {
@@ -194,7 +229,10 @@ export class RulesService {
     if (!rulePath.isEmpty()) {
       const newChunks = rulePath.clone();
       const ruleChunk = newChunks.shift();
-      if (ruleChunk && ruleTree[ruleChunk]) {
+      if (ruleChunk) {
+        if (!ruleTree[ruleChunk]) {
+          ruleTree[ruleChunk] = {}
+        }
         result = this.getTreeNode(ruleTree[ruleChunk], newChunks);
       } else {
         result = null;

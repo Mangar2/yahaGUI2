@@ -70,7 +70,6 @@ export class LineChartComponent {
       data: {
         datasets: [
           {
-            label: 'Chart',
             data: this.data
           }
         ]
@@ -78,6 +77,11 @@ export class LineChartComponent {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
         hover: {
           mode: 'nearest',
           intersect: true

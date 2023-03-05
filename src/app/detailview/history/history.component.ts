@@ -109,8 +109,23 @@ export class HistoryComponent implements AfterViewInit {
   }
 
   /**
+   * Returns the value string
+   * @param historyElement currently show line in the history table
+   * @returns Displayable value string
+   */
+  public getValueString(historyElement: IHistory): string {
+    let result = historyElement.value ? String(historyElement.value) : "";
+    
+    if (result.length > 80) {
+      result = result.substring(0, 79)
+    }
+  
+    return result;
+  }
+
+  /**
    * Returns the reason information as string
-   * @param reasons List of logging information for a value event
+   * @param historyElement currently show line in the history table
    * @returns Displayable string containing all reason informations
    */
   public getReasonString(historyElement: IHistory): string {

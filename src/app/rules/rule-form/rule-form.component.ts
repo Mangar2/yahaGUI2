@@ -78,8 +78,6 @@ export class RuleFormComponent {
   showFields: fieldInfo_t[] = []
 
   @Input() set rule(rule: rule_t | null) {
-    console.log("set");
-    console.log(rule);
     if (rule !== null) {
       this._rule =this.ruleToDisplayObject(rule);
       this.setShowFields();
@@ -113,8 +111,9 @@ export class RuleFormComponent {
       name,
       active: rule.active === undefined || rule.active === true ? 1 : 0,
       doLog: rule.doLog === undefined || rule.doLog === false ? 0 : 1,
+      isValid: rule.isValid === undefined || rule.isValid === true ? 1 : 0,
       time: stringify(rule.time),
-      weekDays: rule.weekDay || this.defaultValues['weekDays'],
+      weekDays: rule.weekDays || this.defaultValues['weekDays'],
       duration: rule.duration || this.defaultValues['duration'],
       cooldownInSeconds: rule.cooldownInSeconds || this.defaultValues['cooldownInSeconds'],
       delayInSeconds: rule.delayInSeconds || this.defaultValues['delayInSeconds'],
@@ -160,6 +159,24 @@ export class RuleFormComponent {
   }
 
   /**
+   * Checks, if a is equal to b recursively for arrays and simple types
+   * @param a first variable to compare
+   * @param b second variable to compare
+   * @returns true, if a is equal to b 
+   */
+  isEqualRec(a: any, b: any): boolean {
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      for (const index in a) {
+          if (!this.isEqualRec(a[index], b[index])) return false;
+      }
+    } else if (a !== b) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Creates a rule from the current form content.
    * @returns rule in rule_t format
    */
@@ -169,7 +186,7 @@ export class RuleFormComponent {
       active: this._rule["active"] ? true : false,
       doLog: this._rule["doLog"] ? true : false,
       time: this.parse(this._rule['time']).parsed,
-      weekDay: this._rule['weekDay'],
+      weekDays: this._rule['weekDays'],
       duration: this._rule["duration"],
       cooldownInSeconds: Number(this._rule["cooldownInSeconds"]),
       delayInSeconds: Number(this._rule["delayInSeconds"]),
@@ -185,7 +202,7 @@ export class RuleFormComponent {
     }
     let index: keyof rule_t;
     for (index in saveRule) {
-      if (saveRule[index] == this.defaultValues[index]) {
+      if (this.isEqualRec(saveRule[index], this.defaultValues[index])) {
         delete saveRule[index];
       }
     }
