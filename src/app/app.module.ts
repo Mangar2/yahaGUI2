@@ -23,6 +23,8 @@ import { DetailviewModule } from './detailview/detailview.module';
 import { OverviewModule } from './overview/overview.module';
 import { SettingsModule } from './settings/settings.module';
 import { RulesModule } from './rules/rules.module';
+import { ClientsModule } from './clients/clients.module';
+
 
 
 
@@ -40,6 +42,7 @@ import { RulesModule } from './rules/rules.module';
     OverviewModule,
     SettingsModule,
     RulesModule,
+    ClientsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

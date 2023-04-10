@@ -13,7 +13,8 @@ export class HeaderComponent {
   menuList = [ 
     { name: 'Home', link: 'overview'},
     { name: 'Settings', link: 'settings'},
-    { name: 'Rules', link: 'rules'}
+    { name: 'Rules', link: 'rules'},
+    { name: 'Clients', link: 'clients'}
   ]
 
   constructor(private route: ActivatedRoute, private router: Router) {}

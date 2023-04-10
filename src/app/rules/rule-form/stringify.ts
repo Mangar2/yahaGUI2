@@ -29,8 +29,10 @@
         sub.push(`"${index}": ${stringify(elem, indent + '  ')}`)
       }
       result = `{\n  ${indent + sub.join(',\n  ' + indent)}\n${indent}}`;
-    } else if (object !== undefined) {
+    } else if (typeof(object) === 'string') {
       result = `"${object}"`;
+    } else if (object !== undefined) {
+      result = object;
     }
     return result;
   }

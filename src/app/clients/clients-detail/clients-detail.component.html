@@ -1,0 +1,12 @@
+<div *ngIf="_client !== null" class="client-form">
+    <div class="header">
+    </div>
+    <div *ngFor="let divList of showFields">
+        <mat-form-field *ngFor="let field of divList" class="{{field.class}}">
+            <mat-label>{{field.label}}</mat-label>
+            <input *ngIf="field.type === 'input'" matInput [value]="getData(field.name)" readonly=true>
+            <textarea *ngIf="field.type === 'textarea'" matInput [value]="getData(field.name)" readonly=true rows="10">
+            </textarea>
+        </mat-form-field>
+    </div>
+</div>

@@ -11,7 +11,7 @@ export class ErrorList {
  * Information about a token, content and position
  */
 export type tokenInfo_t = {
-    tk: string,
+    tk: string | number,
     line: number,
     pos: number
 }
@@ -58,7 +58,7 @@ class Tokenizer {
      * Adds a token to the result list
      * @param tk token to add
      */
-    private addTk(tk: string) {
+    private addTk(tk: string | number) {
         this.result.push({
             tk,
             line: this.line,
@@ -116,7 +116,12 @@ class Tokenizer {
         while (ch !== undefined) {
             if (this.separators.includes(ch)) {
                 if (cur.length > 0) {
-                    this.addTk(cur);
+                    const number = parseFloat(cur);
+                    if (isNaN(number)) { 
+                        this.addTk(cur);
+                    } else {
+                        this.addTk(number);
+                    }
                     cur = "";
                 }
                 if (this.stringChars.includes(ch)) {
@@ -150,12 +155,12 @@ export class Parser {
         this.errorList = tokenizerResult.errors;
     }
 
-    private getTk(): string | undefined {
+    private getTk(): string | number | undefined {
         const cur = this.tokens[this.pos];
         return cur !== undefined ? cur.tk : undefined;
     }
 
-    private nextTk(): string | undefined {
+    private nextTk(): string | number | undefined {
         this.pos++;
         let curTk = this.getTk();
         while (curTk === ' ' || curTk === '\n') {
@@ -170,7 +175,7 @@ export class Parser {
      * @param expected expected token to skip
      * @returns token after expected token or next token on error
      */
-    private skipNextTk(expected: string): string | undefined {
+    private skipNextTk(expected: string): string | number | undefined {
         const tk = this.nextTk();
         if (tk !== expected) {
             this.error(expected + ' expected');

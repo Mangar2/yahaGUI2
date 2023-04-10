@@ -19,75 +19,45 @@ export type rule_t = {
   check?: rule,
   value?: rule,
   time?: string | rule,
-  weekDays?: string | string[],
+  weekdays?: string | string[],
   duration?: number | string,
   cooldownInSeconds?: number,
   delayInSeconds?: number,
-  qos?: number
+  qos?: number,
+  errors?: string
 }
 
 export type rules_t = rule_t[];
 
 export type ruleTree_t = {
-  [index: string]: ruleTree_t | any;
+  rule?: rule_t;
+  childs?: {
+    [index: string]: ruleTree_t;
+  }
+}
+
+export type ruleTreeExternalFormat_t = {
+  [index:string]: ruleTreeExternalFormat_t | any
 }
 
 export class RulePath {
   chunks: string[];
+  name: string | null = null;
 
-  constructor(chunks: string[] = []) {
+  constructor(chunks: string[] = [], name: string | null = null) {
     this.chunks = [...chunks];
+    this.name = name;
   }
 
-  clone = () => new RulePath(this.chunks);
-  shift = () => this.chunks.shift();
-
-  /**
-   * Removes any rules element from the chunk
-   * @returns chunks without "rules" chunk
-   */
-  private removeRule(): string[] {
-    const result = [];
-    for (const chunk of this.chunks) {
-      if (chunk !== 'rules') {
-        result.push(chunk);
-      }
+  clone = () => new RulePath(this.chunks, this.name);
+  shift = () => {
+    let result = this.chunks.shift();
+    if (result === undefined && this.name) {
+      result = this.name;
+      this.name = null;
     }
     return result;
-  }
-
-  /**
-   * A rule path has the format
-   * a/b/c/rules/name
-   * The name is the last chunk after "rules" is signaling a tree leaf node
-   */
-  get name(): string | null {
-    let result = null;
-    if (this.chunks.at(-2) === 'rules') {
-      result = this.chunks.at(-1);
-    }
-    return result === undefined ? null : result;
-  }
-
-  set name(name: string | null) {
-    if (this.chunks.at(-1) === 'rules' && name !== null) {
-      this.chunks.push(name);
-    } else if (this.chunks.at(-2) === 'rules') {
-      if (name === null) {
-        this.chunks.pop();
-      } else {
-        this.chunks[this.chunks.length - 1] = name;
-      }
-    } else if (name !== null) {
-      this.chunks.push('rules');
-      this.chunks.push(name);
-    }
-  }
-
-  /**
-   * @returns true, if the path has a "rules" entry
-   */
-  hasRules = (): boolean => this.chunks.includes('rules');
+  };
 
   /**
    * Last element of the path
@@ -101,44 +71,34 @@ export class RulePath {
    * Returns the topic for the rule
    * @returns topic matching the chunk
    */
-  toTopic = () => this.removeRule().join('/');
-
-  /**
-   * @returns the path as string separated by '/'
-   */
-  toString = () => this.chunks.join('/');
+  toTopic = () => this.chunks.join('/') + (this.name !== null ? `/${this.name}` : "");
 
   /**
    * Checks, if the chunk list is empty
    * @returns true, if the chunk list is empty
    */
-  isEmpty = () => this.chunks.length === 0;
+  isEmpty = () => this.chunks.length === 0 && this.name === null;
 
   /**
    * Pops the last item from the path
+   * @returns the last item just removed
    */
-  pop() {
-    while (this.hasRules()) {
-      this.chunks.pop();
+  pop(): string | undefined {
+    let result: string | undefined;
+    if (this.name !== null) {
+      result = this.name;
+      this.name = null;
+    } else {
+      result = this.chunks.pop();
     }
-    this.chunks.pop();
+    return result;
   }
 
   /**
    * pushes a new item to the path
    */
   push(chunk: string) {
-    if (this.chunks.at(-1) === 'rules' && chunk !== null) {
-      this.chunks.push(chunk);
-    } else if (this.chunks.at(-2) === 'rules') {
-      if (chunk === null) {
-        this.chunks.pop();
-      } else {
-        this.chunks[this.chunks.length - 1] = chunk;
-      }
-    } else {
-      this.chunks.push(chunk);
-    }
+    this.chunks.push(chunk);
   }
 
 }
@@ -160,7 +120,7 @@ export class RulesService {
    * Stores configuration
    * @returns observable
    */
-  readRules(): Observable<HttpResponse<ruleTree_t>> {
+  readRules(): Observable<HttpResponse<ruleTreeExternalFormat_t>> {
     const topic = 'automation/rules';
     return this.httpClient.get<ruleTree_t>(environment.configHost + topic, { observe: 'response' });
   }
@@ -170,6 +130,8 @@ export class RulesService {
    */
   private getRulesFromLocalStore() {
     let rules = {}
+    return rules;
+    /*
     const storedData = localStorage.getItem(this.storeName)
     if (storedData) {
       try {
@@ -180,6 +142,7 @@ export class RulesService {
       }
     }
     return rules
+    */
   }
 
   /**
@@ -191,49 +154,50 @@ export class RulesService {
     }
   }
 
-  setRules(rules: ruleTree_t) {
-    this.rules = rules;
-  }
-
   /**
-   * Converts a rule tree to a rule list
-   * @param rules tree of rules
-   * @param name current name => fills recursively, leave blank!
+   * Sets the rule tree from an input in external format
+   * @param rules rules in external format
+   * @param cur current node, leave empty!!
    */
-  treeToList(rules: ruleTree_t, name: string = ""): rules_t {
-    const result: rules_t = []
-
-    for (const chunk in rules) {
-      const subtree: any = rules[chunk]
-      if (chunk !== 'rules') {
-        result.push(...this.treeToList(rules[chunk], name + '/' + chunk))
-      } else {
-        const ruleTree = rules['rules'];
-        for (const ruleChunk in ruleTree) {
-          const ruleName = name += '/' + ruleChunk;
-          const rule: rule_t = { name: ruleName, ...ruleTree[ruleChunk] }
-          result.push(rule)
+  setRulesFromExternalFormat(rules: ruleTreeExternalFormat_t, node: ruleTree_t | null = null) {
+    if (node === null) {
+      node = this.rules;
+    }
+    if (!node.childs) {
+      node.childs = {}
+    }
+    for (const name in rules) {
+      if (name === 'rules') {
+        const ruleList = rules['rules'];
+        for (const name in ruleList) {
+          node.childs[name] = { rule: ruleList[name] }
         }
+      } else {
+        node.childs[name] = {}
+        this.setRulesFromExternalFormat(rules[name], node.childs[name])
       }
     }
-    return result;
   }
 
   /**
    * Runs through the tree to select a tree node
+   * @param node current node to the tree
    * @param rulePath path to the node
    * @returns node of the tree
    */
-  getTreeNode(ruleTree: ruleTree_t, rulePath: RulePath): ruleTree_t | any {
-    let result: ruleTree_t | null = ruleTree;
+  private getTreeNodeRec(node: ruleTree_t, rulePath: RulePath): ruleTree_t | null {
+    let result: ruleTree_t | null = node;
     if (!rulePath.isEmpty()) {
-      const newChunks = rulePath.clone();
-      const ruleChunk = newChunks.shift();
+      const clonedPath = rulePath.clone();
+      const ruleChunk = clonedPath.shift();
       if (ruleChunk) {
-        if (!ruleTree[ruleChunk]) {
-          ruleTree[ruleChunk] = {}
+        if (!node.childs) {
+          node.childs = {}
         }
-        result = this.getTreeNode(ruleTree[ruleChunk], newChunks);
+        if (!node.childs[ruleChunk]) {
+          node.childs[ruleChunk] = {}
+        }
+        result = this.getTreeNodeRec(node.childs[ruleChunk], clonedPath);
       } else {
         result = null;
       }
@@ -242,17 +206,12 @@ export class RulesService {
   }
 
   /**
-   * Checks, if a node has nodes
+   * Gets the node of the rules tree
    * @param rulePath path to the node
-   * @returns true, if the path leads to a node that may contain rules (a leaf-node)
+   * @returns tree node or null if not found
    */
-  isRuleNode(rulePath: RulePath): boolean {
-    if (rulePath.hasRules()) {
-      return true;
-    } else {
-      const node = this.getTreeNode(this.rules, rulePath);
-      return node['rules'] !== undefined;
-    }
+  getTreeNode(rulePath: RulePath): ruleTree_t | null {
+    return this.getTreeNodeRec(this.rules, rulePath);
   }
 
   /**
@@ -261,51 +220,54 @@ export class RulesService {
    * @returns node of the tree
    */
   updateTreeNode(rulePath: RulePath, newRule: rule_t) {
-    const curChunks = rulePath.clone();
+    const clonedPath = rulePath.clone();
+    const curName = clonedPath.pop();
     const newName = newRule.name?.split('/').at(-1);
-    const curName = rulePath.name;
-
-    if (newName !== undefined) {
-      curChunks.name = null;
-      const node = this.getTreeNode(this.rules, curChunks);
-      node[newName] = newRule;
-      if (newName !== curName && curName !== null) {
-        delete node[curName];
+    const node = this.getTreeNode(clonedPath);
+    
+    if (newName !== undefined && node) {
+      if (node.childs === undefined) {
+        node.childs = {}
+      }
+      node.childs[newName] = { rule: newRule };
+      if (newName !== curName && curName) {
+        delete node.childs[curName];
       }
     }
   }
 
   /**
-   * Deletes a rule
-   * @param rulePath path to the rule
+   * Deletes a node and all parent noded, if they are empty after the deletion
+   * @param rulePath path to the node
+   * @returns rulePath to the first parent node with childs
    */
-  deleteRule(rulePath: RulePath) {
-    const curChunks = rulePath.clone();
-    const curName = rulePath.name;
+  deleteNode(rulePath: RulePath): RulePath {
+    let clonedPath = rulePath.clone();
+    const curName = clonedPath.pop();
+    const node = this.getTreeNode(clonedPath);
 
-    if (curName !== null) {
-      curChunks.name = null;
-      const node = this.getTreeNode(this.rules, curChunks);
-      delete node[curName];
+    if (curName && node && node.childs) {
+      delete node.childs[curName];
+      // 
+      if (Object.keys(node.childs).length === 0) {
+        clonedPath = this.deleteNode(clonedPath);
+      }
     }
+    return clonedPath;
   }
 
   /**
-   * Gets the list of rule names of the current tree path
-   * @param name current name => fills recursively, leave blank!
+   * Gets the list of names of the current tree path
+   * @param rulePath path to the node
    */
   getNameList(rulePath: RulePath): string[] {
-    const curPath = rulePath.clone();
-    curPath.name = null;
-    let treeNode: ruleTree_t | null = this.getTreeNode(this.rules, curPath);
+    const clonedPath = rulePath.clone();
+    let treeNode: ruleTree_t | null = this.getTreeNode(clonedPath);
     let result: string[] = [];
-    if (treeNode !== null && treeNode['rules'] !== undefined) {
-      treeNode = treeNode['rules'];
-    }
 
     if (treeNode) {
-      for (const ruleChunk in treeNode) {
-        result.push(ruleChunk);
+      for (const name in treeNode.childs) {
+        result.push(name);
       }
     }
     return result;
@@ -318,20 +280,31 @@ export class RulesService {
    */
   getRule(rulePath: RulePath): rule_t | null {
     let result: rule_t | null = null;
-    const treeNode: ruleTree_t | any = this.getTreeNode(this.rules, rulePath);
-    if (treeNode) {
-      result = treeNode;
+    const treeNode: ruleTree_t | any = this.getTreeNode(rulePath);
+    if (treeNode && treeNode.rule) {
+      result = treeNode.rule;
     }
     return result;
   }
 
+  /**
+   * Adds a piece to a path, if the corresponding node exists in the tree
+   * @param rulePath current path
+   * @param chunk element to add to the path
+   * @returns new path
+   */
   getPath(rulePath: RulePath, chunk: string): RulePath {
-    const treeNode = this.getTreeNode(this.rules, rulePath);
-    if (treeNode !== null && treeNode['rules'] !== undefined) {
-      rulePath.push('rules');
+    const result = rulePath.clone();
+    result.name = null;
+    const node = this.getTreeNode(result);
+    if (node && node.childs && node.childs[chunk]) {
+      if (node.childs[chunk].rule) {
+        result.name = chunk;
+      } else {
+        result.push(chunk);
+      }
     }
-    rulePath.push(chunk);
-    return rulePath;
+    return result;
   }
-
+  
 }

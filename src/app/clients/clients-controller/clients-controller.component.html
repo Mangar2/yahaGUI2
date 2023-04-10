@@ -1,0 +1,7 @@
+<main>
+    <app-clients-nav [clients]="clients"  (clientSelected)="onClientSelected($event)">
+    </app-clients-nav>
+    <div class="clients-form">
+        <app-clients-detail [client]="selectedClient"></app-clients-detail>
+    </div>
+</main>

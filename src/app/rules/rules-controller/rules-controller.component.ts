@@ -1,7 +1,7 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MessagesService } from 'src/app/api/messages.service';
-import { RulePath, RulesService, rules_t, ruleTree_t, rule_t } from 'src/app/api/rules.service';
+import { RulePath, RulesService, rules_t, ruleTreeExternalFormat_t, ruleTree_t, rule_t } from 'src/app/api/rules.service';
 
 @Component({
   selector: 'app-rules-controller',
@@ -19,9 +19,9 @@ export class RulesControllerComponent {
 
   ngOnInit() {
     this.updateNavList();
-    this.rulesService.readRules().subscribe((res: HttpResponse<ruleTree_t>) => {
+    this.rulesService.readRules().subscribe((res: HttpResponse<ruleTreeExternalFormat_t>) => {
       if (res.status === 200 && res.body) {
-        this.rulesService.setRules(res.body);
+        this.rulesService.setRulesFromExternalFormat(res.body);
         this.updateNavList();
         this.rulesService.writeRulesToLocalStore();
       }
@@ -54,7 +54,7 @@ export class RulesControllerComponent {
    * @param rulePath path to the rule to delete
    */
   private deleteRule(rulePath: RulePath) {
-    this.rulesService.deleteRule(rulePath);
+    this.rulePath = this.rulesService.deleteNode(rulePath);
     this.updateNavList();
     this.onChunkSelected(null);
     this.rulesService.writeRulesToLocalStore();
@@ -82,11 +82,10 @@ export class RulesControllerComponent {
     if (action.command === "copy" && action.rule.name) {
       action.rule.name += '-copy';
       const newName: string = action.rule.name.split('/').at(-1) || "";
-      this.rulePath.name = newName;
+      this.rulePath.pop();
+      this.rulePath.push(newName);
       this.updateRule(this.rulePath, action.rule);
     } else if (action.command === "save" && action.rule.name) {
-      console.log(action.rule.name);
-      console.log(this.rulePath.toTopic());
       this.updateRule(this.rulePath, action.rule);
       this.publishRule(action.rule, topic);
     } else if (action.command === "delete") {
@@ -111,10 +110,7 @@ export class RulesControllerComponent {
     if (!this.rulePath.isEmpty()) {
       list.unshift('<');
     }
-    list.push('add folder');
-    if (this.rulesService.isRuleNode(this.rulePath)) {
-      list.push('add rule');
-    }
+    list.push('add rule');
     this.navList = list;
   }
 
@@ -140,8 +136,8 @@ export class RulesControllerComponent {
    * @param chunk selected navigation item
    */
   onChunkSelected(chunk: string | null) {
+    this.rulePath.name = null;
     if (chunk === null) {
-      this.rulePath.name = null;
       this.activeChunk = null;
     } else if (chunk === '<') {
       this.rulePath.pop();

@@ -34,8 +34,8 @@
         </mat-form-field>
         <mat-form-field appearance="fill" class="rule-small-input">
             <mat-label>Day of Week</mat-label>
-            <mat-select [(value)]="_rule['weekDays']" multiple>
-                <mat-option *ngFor="let day of weekDays" value="{{day}}">{{day}}</mat-option>
+            <mat-select [(value)]="_rule['weekdays']" multiple>
+                <mat-option *ngFor="let day of weekdays" value="{{day}}">{{day}}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
@@ -68,7 +68,10 @@
     <mat-form-field *ngFor="let field of showFields" class="rule-textarea">
         <mat-label>{{field.label}}</mat-label>
         <textarea matInput rows="{{getRows(field.name)}}" [(ngModel)]="_rule[field.name]"
-            (ngModelChange)="onChange(field.name)"></textarea>
+            (ngModelChange)="onChange(field.name)"
+            readonly="{{field.readonly === true}}"
+            >
+        </textarea>
         <div *ngIf="isInvalidField(field.name)" class="alert">{{getErrorMessage(field.name)}}</div>
     </mat-form-field>
 

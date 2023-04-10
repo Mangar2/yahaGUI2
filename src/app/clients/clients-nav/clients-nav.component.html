@@ -1,0 +1,14 @@
+<aside>
+    <mat-nav-list *ngIf="navList">
+        <mat-list-item *ngFor="let chunk of navList" class="nav-button"
+            [class.nav-button-active]="getType(chunk) === 'active'" 
+            [class.nav-button-normal]="getType(chunk) === 'nav'"
+            (click)="onSelect(chunk)">
+            <span 
+                [class.nav-button-text-active]="getType(chunk) === 'active'"
+                [class.nav-button-text-normal]="getType(chunk) === 'nav'">
+                {{chunk}}
+            </span>
+        </mat-list-item>
+    </mat-nav-list>
+</aside>

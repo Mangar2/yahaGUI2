@@ -3,7 +3,7 @@ import { rule_t } from 'src/app/api/rules.service';
 import { ErrorList, Parser } from './parser';
 import { stringify } from './stringify';
 
-type fieldInfo_t = {  name: keyof rule_t, label: string, class: string }
+type fieldInfo_t = {  name: keyof rule_t, label: string, class: string, readonly?:boolean }
 
 @Component({
   selector: 'app-rule-form',
@@ -19,7 +19,7 @@ export class RuleFormComponent {
   hasErrors: boolean = false;
   folded: boolean = true;
   qosValues = [0, 1, 2];
-  weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   navButtons = [
     {
       img: "save_FILL0_wght400_GRAD0_opsz48.png",
@@ -61,7 +61,7 @@ export class RuleFormComponent {
     anyOf: "",
     noneOf: "",
     time: "",
-    weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     value: ""
   }
 
@@ -72,7 +72,8 @@ export class RuleFormComponent {
     { name: 'noneOf', label: 'None Of', class: 'rule-textarea' },
     { name: 'check', label: 'Check', class: 'rule-textarea' },
     { name: 'value', label: 'Value', class: 'rule-textarea' },
-    { name: 'topic', label: 'Topic', class: 'rule-textarea' }
+    { name: 'topic', label: 'Topic', class: 'rule-textarea' },
+    { name: 'errors', label: 'Errors', class: 'rule-textarea', readonly: true }
   ]
 
   showFields: fieldInfo_t[] = []
@@ -113,7 +114,7 @@ export class RuleFormComponent {
       doLog: rule.doLog === undefined || rule.doLog === false ? 0 : 1,
       isValid: rule.isValid === undefined || rule.isValid === true ? 1 : 0,
       time: stringify(rule.time),
-      weekDays: rule.weekDays || this.defaultValues['weekDays'],
+      weekdays: rule.weekdays || this.defaultValues['weekdays'],
       duration: rule.duration || this.defaultValues['duration'],
       cooldownInSeconds: rule.cooldownInSeconds || this.defaultValues['cooldownInSeconds'],
       delayInSeconds: rule.delayInSeconds || this.defaultValues['delayInSeconds'],
@@ -125,7 +126,8 @@ export class RuleFormComponent {
       check: stringify(rule.check),
       noneOf: stringify(rule.noneOf),
       topic: stringify(rule.topic),
-      value: stringify(rule.value)
+      value: stringify(rule.value),
+      errors: stringify(rule.errors)
     };
   }
 
@@ -186,7 +188,7 @@ export class RuleFormComponent {
       active: this._rule["active"] ? true : false,
       doLog: this._rule["doLog"] ? true : false,
       time: this.parse(this._rule['time']).parsed,
-      weekDays: this._rule['weekDays'],
+      weekdays: this._rule['weekdays'],
       duration: this._rule["duration"],
       cooldownInSeconds: Number(this._rule["cooldownInSeconds"]),
       delayInSeconds: Number(this._rule["delayInSeconds"]),
